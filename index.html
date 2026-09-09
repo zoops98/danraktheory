@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZoopsBooks 단락이론</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* ============================================================
+   ZoopsBooks 단락이론 — design tokens (v1 계승)
+   ============================================================ */
+:root{
+  --ink:#16222E;
+  --ink-2:#41525F;
+  --ink-3:#7A8994;
+  --paper:#FFFFFF;
+  --shell:#EEF3F6;
+  --rule:#D8E2E9;
+  --rule-soft:#E9EFF3;
+
+  --pk:#0E9AD8;
+  --pk-deep:#0B6DA0;
+  --pk-wash:#E7F5FC;
+
+  --head:#0E76C4;   --head-wash:#DCEDFA;
+  --brother:#1B9E86; --brother-wash:#DFF3EE;
+  --child:#B4740B;  --child-wash:#FAEFDA;
+  --enemy:#4A5560;  --enemy-wash:#E2E6EA;
+
+  --intro:#8A93A0;
+  --main:#0E76C4;
+  --support:#3FA9D8;
+  --addition:#7FC5E6;
+
+  --down:#B4740B;
+  --up:#C0392B;
+  --equi:#1B9E86;
+
+  --ok:#178A5A;
+  --warn:#C0392B;
+  --warn-wash:#FCEDEC;
+
+  --sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,"Malgun Gothic",sans-serif;
+  --en:"Pretendard Variable",Pretendard,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);background:var(--shell);color:var(--ink);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+a{color:var(--pk-deep)}
+
+/* ---------- 작업 셸 ---------- */
+.app{display:flex;min-height:100vh}
+.side{width:344px;flex:0 0 344px;background:var(--paper);border-right:1px solid var(--rule);position:sticky;top:0;height:100vh;overflow-y:auto}
+.stage{flex:1;min-width:0;padding:22px 24px 80px}
+
+.brand{padding:20px 22px 15px;border-bottom:1px solid var(--rule-soft)}
+.brand h1{margin:0;font-size:20px;letter-spacing:-.02em;font-weight:800;line-height:1.2}
+.brand h1 em{font-style:normal;color:var(--pk)}
+.brand p{margin:5px 0 0;font-size:12px;color:var(--ink-3);line-height:1.5}
+.blk{padding:16px 22px;border-bottom:1px solid var(--rule-soft)}
+.blk:last-child{border-bottom:0}
+.blk>h2{margin:0 0 9px;font-size:11.5px;font-weight:700;color:var(--ink-3);letter-spacing:.03em}
+.field{margin-bottom:9px}
+.field label{display:block;font-size:12px;color:var(--ink-2);margin-bottom:4px}
+input[type=text],input[type=password],select,textarea{width:100%;border:1px solid var(--rule);border-radius:8px;padding:8px 10px;background:#fff;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--pk);box-shadow:0 0 0 3px var(--pk-wash)}
+textarea{resize:vertical;line-height:1.6}
+#passageInput{min-height:175px;font-size:13.5px}
+.dropzone{border:1.5px dashed var(--rule);border-radius:10px;padding:13px;text-align:center;color:var(--ink-3);font-size:12px;background:#FBFDFE;cursor:pointer}
+.dropzone:hover,.dropzone.hot{border-color:var(--pk);background:var(--pk-wash);color:var(--pk-deep)}
+.shots{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.shot{position:relative;width:56px;height:56px;border-radius:6px;overflow:hidden;border:1px solid var(--rule)}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot button{position:absolute;top:2px;right:2px;width:16px;height:16px;border:0;border-radius:50%;background:rgba(22,34,46,.78);color:#fff;font-size:10px;line-height:16px;padding:0;cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--rule);background:#fff;border-radius:8px;padding:8px 13px;cursor:pointer;font-weight:600;font-size:12.5px}
+.btn:hover{background:var(--pk-wash);border-color:var(--pk)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:var(--pk);border-color:var(--pk);color:#fff;width:100%;padding:11px;font-size:14.5px}
+.btn.primary:hover{background:var(--pk-deep);border-color:var(--pk-deep)}
+.btn.ghost{padding:6px 10px;font-size:12px}
+.btnrow{display:flex;gap:7px;flex-wrap:wrap}
+.keyrow{display:flex;gap:6px}.keyrow input{flex:1}
+.hint{font-size:11px;color:var(--ink-3);line-height:1.5;margin:6px 0 0}
+.prog{display:none;margin-top:11px}.prog.on{display:block}
+.prog .bar{height:4px;background:var(--rule-soft);border-radius:99px;overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:var(--pk);transition:width .4s}
+.prog .step{font-size:11.5px;color:var(--ink-2);margin-top:6px}
+.err{display:none;margin-top:10px;padding:9px 11px;border-radius:8px;background:var(--warn-wash);border:1px solid #F3CFCB;color:#912019;font-size:12px;line-height:1.55}
+.err.on{display:block}
+.toolbar{max-width:210mm;margin:0 auto 12px;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.toolbar .sp{flex:1}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:#fff}
+.seg button{border:0;background:#fff;padding:7px 13px;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.seg button.on{background:var(--pk);color:#fff}
+
+/* ============================================================
+   학습지 — A4 폭(210mm) 기준, 연속 흐름
+   ============================================================ */
+.sheet{
+  width:210mm;max-width:100%;margin:0 auto;background:var(--paper);
+  border:1px solid var(--rule);border-radius:12px;
+  padding:16mm 15mm 14mm;
+}
+
+/* 문서 머리 */
+.docmark{display:flex;align-items:center;gap:10px;padding-bottom:9px;border-bottom:1px solid var(--rule-soft);margin-bottom:14px}
+.zb{width:32px;height:32px;flex:0 0 32px;border-radius:8px;background:var(--pk);color:#fff;display:grid;place-items:center;font-weight:800;font-size:12px}
+.docmark b{font-size:13px;font-weight:800;letter-spacing:-.01em;display:block;line-height:1.3}
+.docmark span{font-size:10px;color:var(--ink-3);font-weight:600}
+.docmark .src{margin-left:auto;font-size:10.5px;color:var(--ink-3)}
+
+.sheet-head{border-bottom:2px solid var(--pk);padding-bottom:15px;margin-bottom:16px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.sheet-head .t{min-width:0;flex:1}
+.sheet-head .mark{font-size:10.5px;font-weight:800;color:var(--pk);letter-spacing:.05em}
+.sheet-head h2{margin:4px 0 0;font-size:24px;font-weight:800;letter-spacing:-.025em;line-height:1.25}
+.sheet-head .en{margin-top:4px;font-size:12px;color:var(--ink-3);font-style:italic}
+.tags{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.tag{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--pk-wash);color:var(--pk-deep);white-space:nowrap}
+.tag.grey{background:#EDF1F4;color:var(--ink-2)}
+
+/* 섹션 */
+.sec{margin-bottom:16px;break-inside:auto}
+.sec:last-child{margin-bottom:0}
+.sec>h3{margin:0 0 4px;font-size:15.5px;font-weight:800;letter-spacing:-.015em;display:flex;align-items:center;gap:8px;break-after:avoid}
+.sec>h3 .n{flex:0 0 auto;width:21px;height:21px;border-radius:6px;background:var(--pk);color:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center}
+.sec>h3 .eb{margin-left:auto;font-size:9px;font-weight:800;letter-spacing:.13em;color:var(--ink-3)}
+.sec>.lead{margin:0 0 11px;font-size:11.5px;color:var(--ink-3);padding-left:29px}
+
+.banner{border:1.5px solid var(--pk);border-radius:8px;padding:9px 15px;text-align:center;color:var(--pk-deep);font-weight:700;font-size:13px;margin:0 0 12px;break-inside:avoid}
+
+/* 라벨 박스 */
+.lbox{border:1px solid var(--rule);border-radius:10px;padding:11px 15px;display:flex;gap:15px;break-inside:avoid}
+.lbox .lab{flex:0 0 74px}
+.lbox .lab .eb{font-size:8.5px;font-weight:800;letter-spacing:.13em;color:var(--pk);display:flex;align-items:center;gap:5px}
+.lbox .lab .eb .num{flex:0 0 auto;width:15px;height:15px;border-radius:4px;background:var(--pk);color:#fff;font-size:9px;font-weight:800;display:grid;place-items:center;letter-spacing:0}
+.lbox.cream .lab .eb .num{background:var(--child)}
+.lbox.rose .lab .eb .num{background:var(--warn)}
+.lbox .lab b{display:block;font-size:12.5px;font-weight:800;margin-top:1px}
+.lbox .bd{flex:1;min-width:0;font-size:11.5px;line-height:1.7;color:var(--ink-2)}
+.lbox .bd p{margin:0 0 4px}.lbox .bd p:last-child{margin:0}
+.lbox.cream{background:#FDFAF2;border-color:#EFE3CA}
+.lbox.cream .lab .eb{color:var(--child)}
+.lbox.rose{background:var(--warn-wash);border-color:#F3CFCB}
+.lbox.rose .lab .eb{color:var(--warn)}
+.lbox.rose .bd{color:#8E2F25}
+
+/* 시각 구조도 */
+.map{background:#FAFCFD;border:1px solid var(--rule-soft);border-radius:12px;padding:13px 15px;break-inside:avoid}
+.map .ttl{font-size:14.5px;font-weight:800;letter-spacing:-.02em}
+.map .sub{font-size:10.5px;color:var(--ink-3);margin-top:1px}
+.flow{display:flex;gap:6px;align-items:stretch;margin-top:11px}
+.fcard{flex:1;min-width:0;background:#fff;border:1px solid var(--rule);border-top:2.5px solid var(--rule);border-radius:9px;padding:9px 10px}
+.fcard.c1{border-top-color:var(--intro)}
+.fcard.c2{border-top-color:var(--main)}
+.fcard.c3{border-top-color:var(--support)}
+.fcard.c4{border-top-color:var(--addition)}
+.fcard .hd{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-bottom:6px}
+.fcard .no{width:18px;height:18px;border-radius:50%;background:var(--pk-wash);color:var(--pk-deep);font-size:8.5px;font-weight:800;display:grid;place-items:center}
+.fcard .meta{font-size:8px;color:var(--ink-3);text-align:right;line-height:1.35}
+.fcard .t{font-size:11.5px;font-weight:800;line-height:1.35}
+.fcard .d{font-size:9.5px;color:var(--ink-3);line-height:1.5;margin-top:3px}
+.arrow{flex:0 0 11px;display:grid;place-items:center;color:var(--ink-3);font-size:11px}
+.coreline{margin-top:10px;background:var(--pk);color:#fff;border-radius:8px;padding:8px 13px;display:flex;gap:10px;align-items:center}
+.coreline .k{font-size:8.5px;font-weight:800;opacity:.8;white-space:nowrap;letter-spacing:.08em}
+.coreline .v{font-size:12px;font-weight:800}
+.qrow{display:flex;gap:7px;margin-top:8px}
+.qrow .q{flex:1;background:#fff;border:1px solid var(--rule-soft);border-radius:8px;padding:6px 10px;font-size:9.5px;color:var(--ink-2)}
+.qrow .q b{color:var(--pk);font-weight:800;margin-right:4px}
+
+/* 지문 마킹 */
+.passage{border:1px solid var(--rule);border-radius:10px;padding:15px 17px;font-family:var(--en);font-size:12.5px;line-height:1.95;background:#FCFDFE;break-inside:avoid}
+.passage .sent{display:inline}
+.sn{display:inline-grid;place-items:center;min-width:15px;height:15px;padding:0 4px;border-radius:4px;background:#E7ECF0;color:var(--ink-2);font-family:var(--sans);font-size:9.5px;font-weight:800;margin-right:4px;vertical-align:1px}
+.sn.p1{background:var(--ink);color:#fff}
+.sn.p2{background:#DCE3E8;color:var(--ink-2)}
+mark{background:none;color:inherit;padding:0;border-radius:3px}
+mark.m-head{background:var(--head-wash);color:var(--head);font-weight:700;box-shadow:inset 0 0 0 1px rgba(14,118,196,.35);padding:1px 3px}
+mark.m-brother{color:var(--brother);font-weight:700;border-bottom:2px solid var(--brother)}
+mark.m-child{background:var(--child-wash);color:var(--child);font-weight:600;padding:1px 3px}
+mark.m-enemy{background:var(--enemy-wash);color:var(--enemy);font-weight:700;box-shadow:inset 0 0 0 1px rgba(74,85,96,.3);padding:1px 3px}
+mark.m-conn{font-style:italic;font-weight:800}
+mark.m-conn.down{color:var(--down);border-bottom:2px dotted var(--down)}
+mark.m-conn.up{color:var(--up);border-bottom:2px dotted var(--up)}
+mark.m-conn.equi{color:var(--equi);border-bottom:2px dotted var(--equi)}
+body.off-head mark.m-head{background:none;color:inherit;font-weight:inherit;box-shadow:none;padding:0}
+body.off-brother mark.m-brother{color:inherit;font-weight:inherit;border-bottom:0}
+body.off-child mark.m-child{background:none;color:inherit;font-weight:inherit;padding:0}
+body.off-enemy mark.m-enemy{background:none;color:inherit;font-weight:inherit;box-shadow:none;padding:0}
+body.off-conn mark.m-conn{color:inherit;font-style:normal;font-weight:inherit;border-bottom:0}
+.legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.lg{border:1px solid var(--rule);border-radius:99px;padding:4px 11px;font-size:11px;font-weight:700;cursor:pointer;background:#fff;user-select:none;display:inline-flex;align-items:center;gap:5px}
+.lg i{width:8px;height:8px;border-radius:2px;display:block}
+.lg.off{opacity:.4}
+.lg[data-k=head] i{background:var(--head)}
+.lg[data-k=brother] i{background:var(--brother)}
+.lg[data-k=child] i{background:var(--child)}
+.lg[data-k=enemy] i{background:var(--enemy)}
+.lg[data-k=conn] i{background:var(--down)}
+
+/* 표 */
+table.zt{width:100%;border-collapse:collapse;font-size:11px}
+table.zt th,table.zt td{border-bottom:1px solid var(--rule-soft);padding:5px 9px;text-align:left;vertical-align:top}
+table.zt thead th{background:#F5F9FB;border-bottom:1.5px solid var(--rule);font-size:9.5px;font-weight:800;color:var(--ink-2);letter-spacing:.03em}
+table.zt td.k{width:82px;color:var(--ink-2);font-size:9.5px;font-weight:800;white-space:nowrap}
+table.zt td.no{width:135px;color:var(--ink-3);font-size:9.5px}
+table.zt .en{font-family:var(--en)}
+.grp-title{display:flex;align-items:center;gap:7px;margin:13px 0 7px;font-size:12.5px;font-weight:800;break-after:avoid}
+.grp-title .dot{width:9px;height:9px;border-radius:3px;display:inline-block}
+.grp-title.head{color:var(--head)} .grp-title.head .dot{background:var(--head)}
+.grp-title.enemy{color:var(--enemy)} .grp-title.enemy .dot{background:var(--enemy)}
+
+/* 연결성 카드 */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.cohcard{border:1px solid var(--rule-soft);border-radius:9px;padding:9px 12px;break-inside:avoid}
+.pill{display:inline-block;font-size:8px;font-weight:800;padding:2px 7px;border-radius:99px;letter-spacing:.05em}
+.pill.head{background:var(--head-wash);color:var(--head)}
+.pill.brother{background:var(--brother-wash);color:var(--brother)}
+.pill.child{background:var(--child-wash);color:var(--child)}
+.pill.enemy{background:var(--enemy-wash);color:var(--enemy)}
+.cohcard .hd{display:flex;gap:6px;align-items:center;margin-bottom:5px}
+.cohcard .hd b{font-size:11px;font-weight:800}
+.cohcard .en{font-family:var(--en);font-size:11.5px;font-weight:700;line-height:1.45}
+.cohcard .ko{font-size:9.5px;color:var(--ink-3);margin-top:3px;line-height:1.5}
+.chain{font-family:var(--en);font-size:10px;line-height:1.7;color:var(--ink-2);margin-top:4px}
+.chain i{font-style:normal;color:var(--ink-3);margin:0 3px}
+
+/* 권력 트리 */
+.tree{border:1px solid var(--rule-soft);border-radius:10px;padding:10px 13px}
+.tnode{padding:3px 0;break-inside:avoid}
+.tnode .row{display:flex;gap:8px;align-items:flex-start}
+.lv{flex:0 0 auto;font-size:8.5px;font-weight:800;border-radius:4px;padding:2px 6px;margin-top:2px;white-space:nowrap}
+.lv.l1{background:var(--ink);color:#fff}
+.lv.l2{background:#E1E7EB;color:var(--ink-2)}
+.lv.l3{background:#F0F3F5;color:var(--ink-3)}
+.tnode .tx{min-width:0;font-family:var(--en);font-size:11px;line-height:1.6}
+.tnode .wy{font-family:var(--sans);font-size:9px;color:var(--ink-3);margin-top:2px;line-height:1.5}
+.tnode .wy b{color:var(--pk-deep);font-weight:800}
+.tkids{margin-left:16px;padding-left:11px;border-left:1.5px solid var(--rule)}
+.typebadge{display:inline-block;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:5px;background:var(--pk-wash);color:var(--pk-deep);margin-bottom:8px}
+
+/* 구성요소 */
+.patternbar{background:var(--pk);color:#fff;border-radius:8px;padding:8px 13px;display:flex;gap:10px;align-items:center;margin-bottom:9px;flex-wrap:wrap;break-inside:avoid}
+.patternbar .k{font-size:8.5px;font-weight:800;opacity:.82;white-space:nowrap;letter-spacing:.06em}
+.patternbar .v{font-size:12.5px;font-weight:800}
+.patternbar .x{margin-left:auto;font-size:9px;opacity:.85;font-weight:700}
+.comps{display:flex;gap:6px;align-items:stretch;margin-bottom:9px}
+.ccard{flex:1;min-width:0;background:#fff;border:1px solid var(--rule);border-top:2.5px solid var(--rule);border-radius:9px;padding:9px 10px;break-inside:avoid}
+.ccard.INTRO{border-top-color:var(--intro)}
+.ccard.MAIN{border-top-color:var(--main)}
+.ccard.SUPPORT{border-top-color:var(--support)}
+.ccard.ADDITION{border-top-color:var(--addition)}
+.ccard .r{font-size:8.5px;font-weight:800;color:var(--ink-3);letter-spacing:.06em}
+.ccard .t{font-size:12.5px;font-weight:800;margin-top:1px}
+.ccard .s{font-size:9px;color:var(--pk-deep);font-weight:700;margin-top:3px}
+.ccard .d{font-size:9.5px;color:var(--ink-3);line-height:1.5;margin-top:4px}
+.comp{border:1px solid var(--rule-soft);border-radius:9px;padding:11px 13px;margin-bottom:8px;break-inside:avoid}
+.comp>.h{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap}
+.cbadge{flex:0 0 auto;display:inline-block;min-width:70px;text-align:center;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:5px;color:#fff}
+.cbadge.INTRO{background:var(--intro)}
+.cbadge.MAIN{background:var(--main)}
+.cbadge.SUPPORT{background:var(--support)}
+.cbadge.ADDITION{background:var(--addition)}
+.comp>.h .role{font-size:10.5px;color:var(--ink-3);font-weight:600}
+.comp .body{font-family:var(--en);font-size:11.5px;line-height:1.75}
+.comp .note{margin-top:7px;font-size:10px;color:var(--ink-2);line-height:1.6;border-top:1px dashed var(--rule);padding-top:7px}
+.comp .note b{color:var(--pk-deep)}
+
+/* 연결어 */
+.conn{border:1px solid var(--rule-soft);border-radius:9px;overflow:hidden}
+.conn .ch{background:#F5F9FB;padding:5px 12px;font-size:9px;font-weight:800;color:var(--ink-2);display:flex;gap:7px;border-bottom:1px solid var(--rule-soft)}
+.crow{display:flex;gap:9px;align-items:center;padding:6px 12px;border-bottom:1px solid var(--rule-soft);break-inside:avoid}
+.crow:last-child{border-bottom:0}
+.dirp{flex:0 0 60px;font-size:8.5px;font-weight:800}
+.dirp.down{color:var(--down)}.dirp.up{color:var(--up)}.dirp.equi{color:var(--equi)}
+.crow .w{flex:0 0 104px;font-family:var(--en);font-weight:800;font-style:italic;font-size:11px}
+.crow .f{flex:0 0 70px;font-size:9px;font-weight:700;color:var(--pk-deep)}
+.crow .d{flex:1;font-size:9.5px;color:var(--ink-3);line-height:1.5}
+.crow .s{flex:0 0 auto;font-size:8.5px;color:var(--ink-3)}
+
+/* 치환 */
+.para{display:grid;gap:6px}
+.prow{border:1px solid var(--rule-soft);border-radius:9px;padding:8px 12px;break-inside:avoid}
+.prow .top{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.prow .a{font-family:var(--en);font-size:11.5px;font-weight:700;color:var(--head)}
+.prow .ar{color:var(--ink-3);font-size:10px}
+.prow .b{font-family:var(--en);font-size:11.5px;color:var(--ink-2)}
+.prow .p{font-size:9.5px;color:var(--ink-3);margin-top:3px;line-height:1.55}
+
+/* 문장 분석 */
+.line{border:1px solid var(--rule);border-radius:10px;padding:11px 13px;margin-bottom:8px;break-inside:avoid}
+.line.key{border-color:var(--child);background:#FFFDF8}
+.line .lh{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-bottom:7px}
+.snum{background:var(--pk);color:#fff;font-size:8.5px;font-weight:800;padding:2px 8px;border-radius:99px}
+.tagm{font-size:8.5px;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--pk-wash);color:var(--pk-deep)}
+.tagm.g{background:var(--rule-soft);color:var(--ink-3)}
+.keymark{margin-left:auto;font-size:8.5px;font-weight:800;color:var(--child);background:var(--child-wash);padding:2px 9px;border-radius:99px}
+.line .sen{font-family:var(--en);font-size:12px;font-weight:700;line-height:1.5;margin-bottom:7px}
+.cols{display:grid;grid-template-columns:1.02fr .98fr;gap:11px;align-items:start}
+table.chunk{width:100%;border-collapse:collapse;font-size:9.4px}
+table.chunk td{border:1px solid var(--rule-soft);padding:2.5px 7px;vertical-align:top;line-height:1.45}
+table.chunk td:first-child{width:53%;font-family:var(--en);font-size:9.8px}
+table.chunk td:last-child{color:var(--ink-2)}
+.kv{display:flex;gap:8px;padding:2.5px 0;border-bottom:1px solid var(--rule-soft);font-size:9.6px;line-height:1.5}
+.kv:last-of-type{border-bottom:0}
+.kv .k{flex:0 0 52px;font-size:8.6px;font-weight:800;color:var(--ink-3);padding-top:1px}
+.kv .v{flex:1;min-width:0;color:var(--ink-2)}
+.kv .v .rel{color:var(--pk-deep);font-weight:800}
+.kv .v .sub{display:block;font-size:8.8px;color:var(--ink-3);margin-top:1px}
+.gram{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px}
+.gcard{background:#F7FBFD;border-radius:7px;padding:5px 9px}
+.gcard b{font-family:var(--en);font-size:9.8px;color:var(--pk-deep);display:block;line-height:1.35}
+.gcard span{font-size:8.6px;color:var(--ink-3);line-height:1.45;display:block;margin-top:1px}
+.exam{margin-top:5px;background:var(--child-wash);border-radius:7px;padding:5px 10px;display:flex;gap:8px;align-items:baseline}
+.exam b{flex:0 0 auto;font-size:8.6px;font-weight:800;color:var(--child)}
+.exam span{font-size:9.2px;color:var(--ink-2);line-height:1.5}
+
+/* 어휘 */
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.vrow{display:flex;gap:8px;align-items:baseline;padding:4px 2px;border-bottom:1px solid var(--rule-soft)}
+.vrow .w{flex:0 0 84px;font-family:var(--en);font-weight:700;font-size:10.5px}
+.vrow .k{flex:0 0 66px;font-size:9.5px;font-weight:700;color:var(--pk-deep)}
+.vrow .d{flex:1;font-size:9px;color:var(--ink-3);line-height:1.45}
+
+/* 해석 */
+.trans{font-size:11px;line-height:1.8;color:var(--ink-2)}
+.trans p{margin:0 0 5px;break-inside:avoid}
+.trans p b{color:var(--ink);font-weight:700}
+
+/* 답 도출 · 시험 */
+.score{display:flex;gap:7px}
+.scard{flex:1;background:var(--pk);color:#fff;border-radius:10px;padding:11px 12px;break-inside:avoid}
+.scard .no{width:19px;height:19px;border-radius:50%;background:rgba(255,255,255,.2);font-size:8.5px;font-weight:800;display:grid;place-items:center;margin-bottom:6px}
+.scard .t{font-size:12px;font-weight:800;line-height:1.35}
+.scard .d{font-size:9.5px;opacity:.85;line-height:1.55;margin-top:3px}
+.routes{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.rcard{border:1px solid var(--rule-soft);border-radius:9px;padding:8px 11px;break-inside:avoid}
+.rcard .tp{display:inline-block;font-size:8px;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--pk-wash);color:var(--pk-deep);margin-bottom:4px}
+.rcard .q{font-size:10.5px;font-weight:700;line-height:1.5}
+.rcard .b{font-size:9px;color:var(--ink-3);margin-top:4px;padding-top:4px;border-top:1px dashed var(--rule)}
+.alert{font-size:10px;line-height:1.6;display:flex;gap:6px;margin-bottom:3px}
+.alert:last-child{margin-bottom:0}
+.wrow{display:flex;gap:9px;padding:5px 0;border-bottom:1px solid var(--rule-soft);font-size:11px;line-height:1.6;break-inside:avoid}
+.wrow:last-child{border-bottom:0}
+.wrow .n{flex:0 0 17px;height:17px;border-radius:50%;background:var(--pk-wash);color:var(--pk-deep);font-size:9px;font-weight:800;display:grid;place-items:center;margin-top:2px}
+.qc{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.qcard{border:1px solid var(--rule-soft);border-radius:8px;padding:7px 11px;display:flex;gap:8px;align-items:baseline;break-inside:avoid}
+.qcard .ic{color:var(--ok);font-size:10px}
+.qcard b{font-size:9.5px;font-weight:800}
+.qcard span{font-size:9px;color:var(--ink-3);display:block}
+.acard{border:1px solid var(--rule);border-radius:9px;padding:11px 13px;margin-bottom:7px;break-inside:avoid}
+.acard .lbl{font-size:10px;font-weight:800;color:var(--pk-deep);margin-bottom:3px}
+.acard .val{font-size:12.5px;font-weight:700;line-height:1.55}
+.acard .rz{margin-top:5px;font-size:9.5px;color:var(--ink-3);line-height:1.55}
+
+/* 워크북 */
+.wbq{border:1px solid var(--rule-soft);border-radius:9px;padding:10px 13px;margin-bottom:7px;break-inside:avoid}
+.wbq .q{font-size:11px;font-weight:700;margin-bottom:6px}
+.wbq .q em{font-style:normal;font-size:8.5px;font-weight:800;color:var(--pk);margin-left:5px}
+.wbq .ch{display:grid;gap:3px;font-family:var(--en);font-size:10.5px}
+.wbq .space{border:1px dashed var(--rule);border-radius:7px;height:38px;background:#FAFCFD;margin-top:4px}
+.wbq .ans{margin-top:6px;padding-top:6px;border-top:1px dashed var(--rule);font-size:9.5px;color:var(--ink-2)}
+.wbq .ans b{color:var(--pk-deep)}
+body.mode-student .t-only{display:none}
+body.mode-teacher .s-only{display:none}
+
+.footline{margin-top:16px;padding-top:9px;border-top:1px solid var(--rule-soft);font-size:9px;color:var(--ink-3);text-align:center}
+
+/* ---------- 사용 설명서 ---------- */
+.man{width:210mm;max-width:100%;margin:0 auto;background:#fff;padding:16mm 15mm 14mm}
+.man .mhead{border-bottom:2px solid var(--pk);padding-bottom:14px;margin-bottom:18px}
+.man .mhead .mk{font-size:10.5px;font-weight:800;color:var(--pk);letter-spacing:.05em}
+.man .mhead h1{margin:5px 0 0;font-size:25px;font-weight:800;letter-spacing:-.025em}
+.man .mhead p{margin:6px 0 0;font-size:12px;color:var(--ink-3);line-height:1.6}
+.man h2.mt{font-size:16px;font-weight:800;margin:22px 0 9px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px;break-after:avoid}
+.man h2.mt .bar{width:4px;height:15px;background:var(--pk);border-radius:2px;display:inline-block}
+.man p.mp{font-size:12px;line-height:1.75;color:var(--ink-2);margin:0 0 8px}
+.terms{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.term{border:1px solid var(--rule-soft);border-radius:8px;padding:8px 11px;break-inside:avoid}
+.term b{font-size:11.5px;font-weight:800;display:block}
+.term b span{font-weight:600;color:var(--ink-3);font-size:10px;margin-left:4px}
+.term p{margin:2px 0 0;font-size:10.5px;color:var(--ink-2);line-height:1.6}
+.steps{counter-reset:st}
+.stp{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--rule-soft);break-inside:avoid}
+.stp:last-child{border-bottom:0}
+.stp .n{flex:0 0 20px;height:20px;border-radius:50%;background:var(--pk);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;margin-top:2px}
+.stp b{font-size:12px;font-weight:800;display:block}
+.stp p{margin:1px 0 0;font-size:10.5px;color:var(--ink-2);line-height:1.6}
+.chap{border:1px solid var(--rule);border-radius:10px;padding:13px 15px;margin-bottom:9px;break-inside:avoid}
+.chap .ch-h{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:7px}
+.chap .ch-h .num{flex:0 0 auto;width:21px;height:21px;border-radius:6px;background:var(--pk);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
+.chap .ch-h h3{margin:0;font-size:14px;font-weight:800;letter-spacing:-.015em}
+.chap .ch-h .eb{font-size:8.5px;font-weight:800;letter-spacing:.13em;color:var(--ink-3);margin-left:auto}
+.chap .what{font-size:11.5px;color:var(--ink);line-height:1.7;margin:0 0 7px;font-weight:600}
+.chap .why{background:var(--pk-wash);border-radius:7px;padding:7px 11px;font-size:10.5px;color:var(--pk-deep);line-height:1.6;margin-bottom:7px}
+.chap .why b{font-weight:800}
+.chap .rd{margin:0 0 7px}
+.chap .rd .lbl{font-size:9px;font-weight:800;color:var(--ink-3);letter-spacing:.08em;margin-bottom:3px}
+.chap .rd ul{margin:0;padding-left:16px}
+.chap .rd li{font-size:10.5px;line-height:1.65;color:var(--ink-2);margin-bottom:2px}
+.chap .rd li b{color:var(--ink);font-weight:700}
+.chap .use{background:#FDFAF2;border:1px solid #EFE3CA;border-radius:7px;padding:7px 11px;display:flex;gap:8px;align-items:baseline}
+.chap .use b{flex:0 0 auto;font-size:9px;font-weight:800;color:var(--child)}
+.chap .use span{font-size:10.5px;color:var(--ink-2);line-height:1.65}
+.modewrap{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modecard{border:1px solid var(--rule);border-radius:9px;padding:11px 13px;break-inside:avoid}
+.modecard .t{font-size:12.5px;font-weight:800;margin-bottom:5px}
+.modecard .t em{font-style:normal;font-size:9px;font-weight:700;color:#fff;background:var(--pk);padding:2px 7px;border-radius:99px;margin-left:5px}
+.modecard ul{margin:0;padding-left:15px}
+.modecard li{font-size:10.5px;line-height:1.65;color:var(--ink-2)}
+
+.modal{position:fixed;inset:0;background:rgba(22,34,46,.55);display:none;z-index:60;padding:26px 16px;overflow-y:auto}
+.modal.on{display:block}
+.modal .mbox{max-width:900px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden}
+.modal .mbox>header{padding:14px 20px;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:0;background:#fff;z-index:2}
+.modal .mbox>header h3{margin:0;font-size:16px;font-weight:800}
+.modal .mbox>header .hr{display:flex;gap:6px}
+
+/* 빈 상태 */
+.empty{max-width:660px;margin:60px auto;text-align:center;color:var(--ink-3)}
+.empty h2{color:var(--ink);font-size:22px;font-weight:800;margin:0 0 9px;letter-spacing:-.02em}
+.empty p{font-size:13px;line-height:1.7;margin:0 0 20px}
+.pkg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:left}
+.pkc{background:#fff;border:1px solid var(--rule);border-radius:9px;padding:11px 13px}
+.pkc .k{font-size:10px;font-weight:800;color:var(--pk)}
+.pkc .t{font-size:12px;font-weight:700;color:var(--ink);margin-top:2px}
+
+/* ============================================================
+   PRINT — A4 상하좌우 여백 확보 + 페이지 분할
+   ============================================================ */
+@media print{
+  /* 상하좌우 여백 — @page 로 1차, .sheet 안쪽 패딩으로 2차.
+     인쇄 대화상자에서 '여백 없음'을 골라도 최소 여백이 남는다. */
+  @page{size:A4 portrait;margin:12mm 12mm 12mm}
+  html,body{background:#fff!important}
+  body{font-size:10.2px;orphans:3;widows:3}
+  .side,.toolbar,.legend,.no-print{display:none!important}
+  .stage{padding:0}
+  .sheet{width:auto;max-width:none;border:0;border-radius:0;margin:0;padding:4mm 4mm 3mm}
+  .man{width:auto;max-width:none;padding:4mm 4mm 3mm;margin:0}
+  .chap,.term,.stp,.modecard{break-inside:avoid}
+  .man h2.mt{break-after:avoid}
+  .modal{display:none!important}
+  body.printing-manual .app{display:none!important}
+  body.printing-manual #manModal{display:block!important;position:static;background:none;padding:0;overflow:visible}
+  body.printing-manual #manModal .mbox{max-width:none;border-radius:0}
+  body.printing-manual #manModal>.mbox>header{display:none!important}
+
+  /* 큰 묶음마다 새 쪽에서 시작 */
+  .pbreak{break-before:page;page-break-before:always}
+  .sec>h3,.grp-title,.banner,.docmark,.sheet-head,.patternbar,.typebadge{break-after:avoid}
+  .lbox,.map,.passage,.cohcard,.ccard,.comp,.line,.prow,.rcard,.scard,
+  .qcard,.acard,.wbq,.crow,.tnode,.wrow,.fcard,.vrow{break-inside:avoid}
+  .trans p,.alert{break-inside:avoid}
+  table.zt thead{display:table-header-group}
+  table.zt tr{break-inside:avoid}
+
+  .sheet-head h2{font-size:20px}
+  .sec{margin-bottom:12px}
+  .docmark{margin-bottom:11px}
+  .footline{break-inside:avoid}
+
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+
+@media (max-width:1180px){
+  .app{flex-direction:column}
+  .side{width:100%;flex:none;position:static;height:auto;border-right:0;border-bottom:1px solid var(--rule)}
+  .stage{padding:14px 10px 50px}
+  .sheet{width:100%;padding:18px 14px}
+  .flow,.comps,.score{flex-direction:column}
+  .arrow{display:none}
+  .g2,.routes,.qc,.gram,.vgrid,.cols{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body class="mode-teacher">
+
+<div class="app">
+  <aside class="side no-print">
+    <div class="brand">
+      <h1>ZoopsBooks <em>단락이론</em></h1>
+      <p>영어 지문을 단락의 <b>연결성</b>과 <b>권력관계</b>로 분해해 A4 학습지로 만듭니다.</p>
+    </div>
+
+    <div class="blk">
+      <h2>GEMINI API 키</h2>
+      <div class="keyrow">
+        <input type="password" id="apiKey" placeholder="AIza…" autocomplete="off">
+        <button class="btn ghost" id="btnKeySave">저장</button>
+      </div>
+      <p class="hint">키는 이 브라우저에만 보관됩니다. <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">발급</a></p>
+      <div class="field" style="margin-top:10px">
+        <label for="modelSel">분석 모델</label>
+        <select id="modelSel">
+          <option value="gemini-2.5-pro">gemini-2.5-pro (정확도 우선 · 권장)</option>
+          <option value="gemini-2.5-flash">gemini-2.5-flash (속도 우선)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h2>지문 입력</h2>
+      <div class="field">
+        <textarea id="passageInput" placeholder="영어 지문을 붙여넣으세요.&#10;&#10;여기에 스크린샷을 바로 Ctrl+V 해도 됩니다."></textarea>
+      </div>
+      <div class="dropzone" id="drop">스크린샷 붙여넣기 · 드래그 · <u>클릭해서 이미지 선택</u></div>
+      <input type="file" id="fileInput" accept="image/*" multiple hidden>
+      <div class="shots" id="shots"></div>
+      <div class="field" style="margin-top:10px">
+        <label for="srcInput">지문 표기 (선택)</label>
+        <input type="text" id="srcInput" placeholder="예: 2025 고1 32번">
+      </div>
+    </div>
+
+    <div class="blk">
+      <button class="btn primary" id="btnRun">단락이론으로 분석하기</button>
+      <div class="prog" id="prog">
+        <div class="bar"><i id="progBar"></i></div>
+        <div class="step" id="progStep">준비 중…</div>
+      </div>
+      <div class="err" id="err"></div>
+      <div class="btnrow" style="margin-top:10px">
+        <button class="btn ghost" id="btnMan">사용 설명서</button>
+        <button class="btn ghost" id="btnDic">연결어 사전</button>
+        <button class="btn ghost" id="btnSample">예시 지문</button>
+        <button class="btn ghost" id="btnClear">초기화</button>
+      </div>
+      <p class="hint">Ctrl(⌘) + Enter 로도 실행됩니다.</p>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="toolbar no-print" id="toolbar" style="display:none">
+      <div class="seg">
+        <button data-mode="teacher" class="on">교사용 해설</button>
+        <button data-mode="student">학생용 워크북</button>
+      </div>
+      <div class="sp"></div>
+      <button class="btn ghost" id="btnPdf">PDF로 저장</button>
+      <button class="btn ghost" id="btnHtml">HTML 내려받기</button>
+    </div>
+
+    <div id="out">
+      <div class="empty">
+        <h2>단락은 절대 끊어지지 않는다</h2>
+        <p>지문을 붙여넣고 분석을 누르면 핵심어·대용어·종속어·대립어의 연결성부터
+           INTRO / MAIN / SUPPORT / ADDITION의 권력관계까지 A4 학습지 한 부로 정리됩니다.</p>
+        <div class="pkg">
+          <div class="pkc"><div class="k">PK1–3</div><div class="t">단락의 연결성</div></div>
+          <div class="pkc"><div class="k">PK4–5</div><div class="t">문장 간 권력관계</div></div>
+          <div class="pkc"><div class="k">PK6–7</div><div class="t">구성요소 간 권력관계</div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal" id="dicModal">
+  <div class="mbox" style="max-width:760px">
+    <header>
+      <h3>연결어(connector) 정리</h3>
+      <div class="hr"><button class="btn ghost" data-close="dicModal">닫기</button></div>
+    </header>
+    <div style="padding:18px 22px" id="dicBody"></div>
+  </div>
+</div>
+
+<div class="modal" id="manModal">
+  <div class="mbox">
+    <header>
+      <h3>ZoopsBooks 단락이론 사용 설명서</h3>
+      <div class="hr">
+        <button class="btn ghost" id="btnManPrint">인쇄 / PDF</button>
+        <button class="btn ghost" id="btnManHtml">HTML 저장</button>
+        <button class="btn ghost" data-close="manModal">닫기</button>
+      </div>
+    </header>
+    <div id="manBody"></div>
+  </div>
+</div>
+
+<script>
+/* ================= 유틸 ================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const arr=v=>Array.isArray(v)?v:[];
+const mem={};
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return mem[k]??null}},
+             set(k,v){try{localStorage.setItem(k,v)}catch(e){mem[k]=v}}};
+
+/* ================= 연결어 사전 (PLUS3) ================= */
+const CONNECTORS={
+  down:{label:'하향 연결어 (1차 → 2차 · 권력을 끌어내린다)',groups:[
+    {cat:'명시(clarification) · 1차의 내용을 다른 방식으로 명확히 풀어 설명',words:'that is / that is to say / in other words'},
+    {cat:'강화(intensification) · 1차를 한 단계 더 강하게 밀어붙여 설명',words:'in fact / as a matter of fact / actually'},
+    {cat:'예시(exemplification) · 1차의 부분적 예를 제시',words:"for example / for instance / as an example / Let's take some examples / Let's say / Let's suppose / to illustrate / in one case"},
+    {cat:'근거(reason) · 1차를 뒷받침하는 근거를 제시',words:'This is because / That is because / It is because / For'}]},
+  up:{label:'상향 연결어 (2차 → 1차 · 권력을 끌어올린다)',groups:[
+    {cat:'인과(cause & effect) · 원인이 되는 2차에서 결과의 1차로 초점 이동',words:'therefore / consequently / as a result / thus / so / accordingly / hence / because of this / due to this / The answer is'},
+    {cat:'전환(switch) · 반대내용의 2차를 뒤집으며 새 1차로 초점 이동',words:'however / though / but / (and) yet / (and) still / in fact / in reality / on the other hand / on the contrary / in contrast / by contrast / by comparison / above all / but -- also / suddenly / instead / nevertheless / nonetheless / in spite of this / despite this / even so / by the way'}]},
+  equi:{label:'동등 연결어 (1차→1차, 2차→2차 · 권력을 똑같이 배분한다)',groups:[
+    {cat:'추가 병렬(additional parallel)',words:'also / equally / and / another example / in addition / additionally / moreover / furthermore / further / what is more / besides / besides this / as well / some — others — still others / first — secondly — thirdly — lastly'},
+    {cat:'유사 병렬(similar parallel)',words:'similarly / likewise / in the same way / by the same token'},
+    {cat:'대조 병렬(contrary parallel)',words:'but / however / on the other hand / in contrast / by contrast'}]}
+};
+function renderDic(){
+  $('#dicBody').innerHTML=Object.entries(CONNECTORS).map(([k,v])=>`
+    <h4 style="margin:16px 0 7px;font-size:13.5px;font-weight:800;display:flex;gap:8px;align-items:center">
+      <span class="dirp ${k}" style="flex:0 0 auto">${k==='down'?'↓ 하향':k==='up'?'↑ 상향':'≒ 동등'}</span>${esc(v.label)}</h4>
+    ${v.groups.map(g=>`<div style="font-size:11.5px;font-weight:700;color:var(--ink-3);margin-top:8px">${esc(g.cat)}</div>
+      <div style="font-family:var(--en);font-size:12.5px;line-height:1.8;color:var(--ink-2)">${esc(g.words)}</div>`).join('')}
+  `).join('');
+}
+
+/* ================= 단락이론 규칙 ================= */
+const THEORY=`
+[단락이론 수능편 — 분석 규칙]
+
+■ 대전제
+단락(paragraph)은 하나의 주장(main idea)을 효과적으로 전달하기 위한 문장 연합체다.
+두 가지 단락논리: ①연결성("단락은 절대 끊어지지 않는다") ②권력관계("1차 정보와 2차 정보의 차별이 있다").
+읽는 목표는 필자의 메시지 A를 A+나 A-가 아니라 가감 없이 A로 받는 것이다.
+
+■ 1. 연결성
+핵심어(head) = ①주제(topic) + ②주제연관어(topic-related words). 모든 단락은 "A는 B이다/하다"로 요약된다(A=주제, B=주제연관어).
+PK1 대용어(brother): 핵심어를 대신할 수 있는 대등한 말. 반복어·대명사·동의어·비슷한 표현·비유적 표현.
+PK2 종속어(child): 핵심어의 부분집합. head는 general, child는 specific이며 범위가 좁아진다.
+PK3 대립어(enemy): 핵심어의 여집합. 대립쌍(conflicting pair)을 이루어 개념을 선명하게 만든다.
+  대립어도 대용어·종속어로 이어져 enemy group을 형성한다. 핵심어 쪽은 head group.
+  ★권력이동(power shift): 대립어가 먼저 나오고(enemy→head) 뒤에 진짜 핵심어가 오면, 앞의 말이 2차 정보로 강등된다.
+paraphrasing: head↔brother↔child↔enemy 연결을 이용해 어려운 표현을 같은 범주의 쉬운 말로 치환하는 것.
+
+■ 2-1. 문장 간 권력관계
+PK4 1차(general) → 2차(specific): ①설명(that is, in other words — 같은 내용, 범위 유지)
+  ②예시(for example — 부분적 예, 범위 축소) ③근거(For, This is because — 주장의 기반)
+PK5 2차(old) → 1차(new): ①문제제기(의문/원인 → The answer is, Therefore) ②반대내용(반전 → however) ③사전지식(배경 제공)
+3문장 이상: TYPE1 직렬결합(general→specific[general]→specific), TYPE2 다중결합(general 아래 여러 specific 병렬)
+
+■ 2-2. 구성요소 간 권력관계 (grouping = 문장 묶기)
+INTRO: MAIN 앞 배경(2차·old). 문제제기/반대내용/사전지식.
+MAIN: 가장 중요한 주장·개념(1차·new). 보통 핵심어가 들어 있다.
+SUPPORT: MAIN 뒤 구체화(2차). 설명/예시/근거.
+ADDITION: MAIN의 반복이나 추가정보. SUPPORT 뒤에 오며 제거해도 흐름을 방해하지 않고 MAIN을 뒤집지 못한다.
+PK6 단락유형1 = MAIN+SUPPORT+ADDITION (general→specific, 두괄식)
+PK7 단락유형2 = INTRO+MAIN+SUPPORT+ADDITION (old→new, INTRO가 길면 미괄식)
+
+■ 연결어(connector)
+down 하향(1차→2차): 명시(that is/in other words), 강화(in fact/actually), 예시(for example/for instance/Let's say/to illustrate/in one case), 근거(This is because/For)
+up 상향(2차→1차): 인과(therefore/consequently/as a result/thus/so/accordingly/hence/because of this), 전환(however/though/but/yet/still/in fact/on the other hand/on the contrary/in contrast/above all/suddenly/instead/nevertheless/in spite of this/even so)
+equi 동등: 추가 병렬(also/and/in addition/moreover/furthermore/besides/as well), 유사 병렬(similarly/likewise/in the same way), 대조 병렬(but/however/on the other hand/in contrast)
+
+■ PLUS1 단락 유형: 의견단락(70%: 설득·주장 / 원인 규명) vs 나열단락(30%: 서술·묘사 / 과정·분포 / 설명·정의 / 비교·대조)
+■ PLUS2 수능문제 유형: ①연결성 40%(빈칸, 순서, 문장삽입, 연결어, 문맥어휘, 무관한 문장, 개념추론)
+  ②권력관계 30%(주제, 요지, 주장, 요약, 제목, 목적) ③독해력 30%(어법, 지시사, 일치, 도표, 심경, 장문)
+`.trim();
+
+/* ================= Gemini ================= */
+const CHAIN={'gemini-2.5-pro':['gemini-2.5-pro','gemini-2.5-flash','gemini-2.0-flash'],
+             'gemini-2.5-flash':['gemini-2.5-flash','gemini-2.5-pro','gemini-2.0-flash']};
+async function callGemini(parts,{temperature=.15,maxOutputTokens=40000}={}){
+  const key=$('#apiKey').value.trim();
+  if(!key) throw new Error('Gemini API 키를 입력하세요.');
+  const chain=CHAIN[$('#modelSel').value]||['gemini-2.5-flash'];
+  let lastErr;
+  for(const model of chain){
+    for(let a=0;a<3;a++){
+      try{
+        const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({contents:[{role:'user',parts}],
+            generationConfig:{temperature,maxOutputTokens,responseMimeType:'application/json'},
+            safetySettings:['HARM_CATEGORY_HARASSMENT','HARM_CATEGORY_HATE_SPEECH','HARM_CATEGORY_SEXUALLY_EXPLICIT','HARM_CATEGORY_DANGEROUS_CONTENT'].map(category=>({category,threshold:'BLOCK_NONE'}))})
+        });
+        if(!res.ok){
+          const t=await res.text();
+          if(res.status===400&&/API key/i.test(t)) throw new Error('API 키가 올바르지 않습니다.');
+          if(res.status===429||res.status>=500){lastErr=new Error(String(res.status));await sleep(1200*2**a);continue}
+          lastErr=new Error(`${model}: ${res.status} ${t.slice(0,180)}`);break;
+        }
+        const d=await res.json(),c=d?.candidates?.[0];
+        const text=(c?.content?.parts||[]).map(p=>p.text||'').join('');
+        if(!text){lastErr=new Error('빈 응답 ('+(c?.finishReason||'?')+')');await sleep(900);continue}
+        return text;
+      }catch(e){lastErr=e; if(/API 키/.test(e.message)) throw e; await sleep(1000*2**a)}
+    }
+  }
+  throw lastErr||new Error('분석 요청에 실패했습니다.');
+}
+function safeParseJson(raw){
+  if(!raw) throw new Error('빈 응답');
+  let s=String(raw).trim().replace(/^\uFEFF/,'');
+  const f=s.match(/```(?:json)?\s*([\s\S]*?)```/i); if(f) s=f[1].trim();
+  const i0=Math.min(...['{','['].map(c=>{const i=s.indexOf(c);return i<0?Infinity:i}));
+  if(i0!==Infinity) s=s.slice(i0);
+  try{return JSON.parse(s)}catch(e){}
+  let out='',inStr=false,escd=false;const st=[];
+  for(const ch of s){
+    if(inStr){out+=ch; if(escd){escd=false;continue} if(ch==='\\'){escd=true;continue} if(ch==='"')inStr=false; continue}
+    if(ch==='"'){inStr=true;out+=ch;continue}
+    if(ch==='{'||ch==='['){st.push(ch==='{'?'}':']');out+=ch;continue}
+    if(ch==='}'||ch===']'){st.pop();out+=ch;continue}
+    out+=ch;
+  }
+  if(inStr) out+='"';
+  out=out.replace(/,\s*$/,'');
+  while(st.length){out=out.replace(/,\s*$/,'');out+=st.pop()}
+  try{return JSON.parse(out)}catch(e){throw new Error('분석 결과(JSON)를 읽지 못했습니다. 다시 시도해 주세요.')}
+}
+
+/* ================= 프롬프트 ================= */
+const OCR_P=`너는 영어 지문 OCR 도우미다. 이미지에서 영어 지문 본문만 정확히 추출하라.
+문제 번호, 선택지(①~⑤), 한글 발문, 해설, 페이지 번호는 제외한다. 하이픈 줄바꿈은 복원하고 철자·구두점은 원문 그대로 둔다.
+JSON만: {"passage":"…"}`;
+
+function pA(passage,source){return `${THEORY}
+
+당신은 위 [단락이론 수능편]의 저자 본인이다. 아래 지문을 이 이론의 용어와 판정 기준으로만 분석하라.
+[지문 표기] ${source||'미표기'}
+[지문]
+"""
+${passage}
+"""
+
+■ 1단계: 문장 분해 + 연결성 + 연결어 + 어휘 + 표지
+
+1. 문장 단위로 나눈다. text는 원문 그대로(구두점·인용부호 포함), 임의 병합·분할 금지. id는 s1,s2,… 순서대로.
+2. 핵심어(head): ①주제 ②주제연관어를 지문에서 그대로 인용. "A는 B이다/하다" 한 문장 요약으로 검증한다.
+3. head group: 대용어(brother) 1..n, 종속어(child) 1..n을 등장 순서로. text는 지문에 실제 존재하는 연속 부분 문자열이어야 한다.
+4. enemy group: 대립어가 있으면 같은 방식으로. 없으면 enemy를 null. 대립어가 핵심어보다 먼저 나와 권력이동이 일어났으면 powerShift를 true로 한다.
+5. connectors: dir는 down/up/equi, funcKo는 명시·강화·예시·근거·인과·전환·추가 병렬·유사 병렬·대조 병렬 중 하나. fromSid→toSid 명시.
+6. paraphrase 3~5개: 어려운 표현을 연결성으로 쉬운 말에 치환하는 경로.
+7. vocab 12~18개: w(영어) / k(짧은 한글뜻) / d(20자 내외 보충 설명). 등장 순서.
+8. context: 배경지식 2줄. 첫 줄은 핵심 개념 정의, 둘째 줄은 글의 전개 흐름.
+9. titleKo/titleEn/coreEn/coreKo: 한국어 제목, 영어 부제, 영어 한 문장 요약, 한국어 한 문장 요약.
+10. translation: 문장 id별 자연스러운 한국어 해석.
+
+JSON만 출력:
+{"titleKo":"","titleEn":"","coreEn":"","coreKo":"","context":{"defKo":"","flowKo":""},
+ "summaryKo":"A는 B이다/하다 형식",
+ "sentences":[{"id":"s1","text":""}],
+ "head":{"topic":"","topicRelated":"","noteKo":""},
+ "headGroup":{"brothers":[{"text":"","sid":"s2","kindKo":"반복어|대명사|동의어|비슷한 표현|비유적 표현","forKo":"주제|주제연관어"}],
+              "children":[{"text":"","sid":"s3","noteKo":""}]},
+ "enemyGroup":{"enemy":null,"noteKo":"","powerShift":false,"powerShiftKo":"",
+   "brothers":[{"text":"","sid":"","kindKo":""}],"children":[{"text":"","sid":"","noteKo":""}]},
+ "connectors":[{"word":"","fromSid":"s1","toSid":"s2","dir":"up","funcKo":"전환","noteKo":""}],
+ "paraphrase":[{"hard":"","easy":"","pathKo":""}],
+ "vocab":[{"w":"","k":"","d":""}],
+ "translation":[{"id":"s1","ko":""}]}`;}
+
+function pB(passage,source,sents){return `${THEORY}
+
+당신은 위 [단락이론 수능편]의 저자 본인이다. 아래 지문의 권력관계를 이론 그대로 판정하라.
+[지문 표기] ${source||'미표기'}
+[문장]
+${sents.map(s=>`${s.id}: ${s.text}`).join('\n')}
+
+■ 2단계: 권력관계 + 구성요소 + 단락유형 + 시험 적용
+
+1. power: 문장마다 level(1|2|3), relKo(1차면 "1차 정보(주장/개념)", 2차면 설명/예시/근거/문제제기/반대내용/사전지식 중 하나),
+   parent(상위 문장 id, 최상위면 null), whyKo(근거 한 줄).
+2. combineType: "TYPE1(직렬결합)"|"TYPE2(다중결합)"|"혼합" + 근거.
+3. grouping: role은 INTRO|MAIN|SUPPORT|ADDITION. SUPPORT가 여럿이면 label을 SUPPORT1,SUPPORT2…
+   각 항목에 sids, genSpe("Gen"|"Spe"|"Old"|"New"), titleKo(도입|핵심|뒷받침|부연), subKo(세부 기능), whyKo, innerKo(덩어리 안의 문장 간 권력관계).
+4. paragraphType: value는 "단락유형1: MAIN+SUPPORT+ADDITION" 또는 "단락유형2: INTRO+MAIN+SUPPORT+ADDITION",
+   patternKo는 "INTRO(s1) → MAIN(s2) → SUPPORT(s3-s6) → ADDITION(s7-s8)" 형태, structureKo는 두괄식/미괄식 판정과 이유.
+5. purposeType: value "의견단락"|"나열단락", subKo 세부(설득/주장, 원인 규명 / 서술·묘사, 과정·분포, 설명·정의, 비교·대조).
+6. readingMap: flowTitleKo(글 전체 표어), flowSubKo(부제),
+   steps 4개 [{no:"01",roleKo:"도입|핵심|뒷받침|부연",sidsKo:"문장 1",titleKo:"",lineKo:""}],
+   coreKo("A 증가 → B 축적 → C 향상" 같은 화살표 한 줄), questions 2개.
+7. answers: topicKo/gistKo/claimKo/titleKo/purposeKo와 각각의 reason(근거 구성요소·표현 명시).
+8. scoreUp 3개: {titleKo, descKo} — 이 지문에서 점수를 올리는 실전 착안점.
+9. examRoutes 4개: {catKo:"주제|요지|제목|빈칸|순서|삽입|어휘|일치", qKo, basisKo, typeKo:"연결성|권력관계|독해력"}.
+10. distractors 3개: 오답 선지가 파고드는 함정.
+11. wrapUp 3개: 이 글을 한 줄씩 정리.
+12. workbook 4개: {kind:"핵심어|구성요소|연결어|빈칸|요지", q, choices:[] 또는 4개, answer, explainKo}
+
+JSON만 출력:
+{"power":[{"id":"s1","level":2,"relKo":"","parent":null,"whyKo":""}],
+ "combineType":{"value":"","whyKo":""},
+ "grouping":[{"label":"MAIN","role":"MAIN","titleKo":"핵심","sids":["s2"],"genSpe":"New","subKo":"","whyKo":"","innerKo":""}],
+ "paragraphType":{"value":"","patternKo":"","structureKo":""},
+ "purposeType":{"value":"","subKo":"","whyKo":""},
+ "readingMap":{"flowTitleKo":"","flowSubKo":"","coreKo":"","steps":[{"no":"01","roleKo":"","sidsKo":"","titleKo":"","lineKo":""}],"questions":["",""]},
+ "answers":{"topicKo":"","topicReasonKo":"","gistKo":"","gistReasonKo":"","claimKo":"","claimReasonKo":"","titleKo":"","titleReasonKo":"","purposeKo":"","purposeReasonKo":""},
+ "scoreUp":[{"titleKo":"","descKo":""}],
+ "examRoutes":[{"catKo":"","qKo":"","basisKo":"","typeKo":""}],
+ "distractors":[""],"wrapUp":[""],
+ "workbook":[{"kind":"","q":"","choices":[],"answer":"","explainKo":""}]}`;}
+
+function pC(sents,head){return `${THEORY}
+
+당신은 위 [단락이론 수능편]의 저자 본인이다. 아래 각 문장을 한 문장씩 정밀 분석하라.
+[핵심어] ${head?.topic||''} / ${head?.topicRelated||''}
+[문장]
+${sents.map(s=>`${s.id}: ${s.text}`).join('\n')}
+
+각 문장마다:
+1. chunks: 의미 단위로 3~6조각. en(영어 조각, 순서대로 이어붙이면 원문이 됨) / ko(한글 대응).
+2. transKo: 자연스러운 전체 해석 한 문장.
+3. contextKo: 이 문장이 단락에서 하는 역할 한 문장.
+4. relTitleKo: 앞뒤 문장과의 연결 관계를 단락이론 용어로 짧게(예: "대립어 · 통념 ↔ 실제", "MAIN(1차) → SUPPORT(2차)", "배경(old) → 새 정보(new)").
+   relDescKo: 근거 한 줄. 첫 문장이면 relTitleKo="시작 · 단락 시작", relDescKo="분석할 이전 문장이 없다."
+5. grammar 1~2개: {form, descKo}
+6. examKo: 시험에서 이 문장이 쓰이는 방식. 없으면 빈 문자열.
+7. isKey: MAIN이거나 결론이면 true.
+
+JSON만 출력:
+{"lines":[{"id":"s1","chunks":[{"en":"","ko":""}],"transKo":"","contextKo":"","relTitleKo":"","relDescKo":"","grammar":[{"form":"","descKo":""}],"examKo":"","isKey":false}]}`;}
+
+/* ================= 섹션 정의 — 번호의 유일한 출처 =================
+   결과물과 사용 설명서가 이 배열을 함께 사용하므로 번호가 어긋날 수 없다. */
+const SECTIONS=[
+  {k:'CONTEXT',      n:1,  t:'배경지식',                       eb:'CONTEXT'},
+  {k:'READING_MAP',  n:2,  t:'시각 구조도',                     eb:'READING MAP'},
+  {k:'CORE_SUMMARY', n:3,  t:'핵심 요약',                       eb:'CORE SUMMARY'},
+  {k:'COHESION',     n:4,  t:'지문 마킹 — 단락의 연결성',          eb:'COHESION'},
+  {k:'COHESION_MAP', n:5,  t:'핵심어(head)와 연결성',            eb:'COHESION MAP'},
+  {k:'PARAPHRASE',   n:6,  t:'바꾸어 말하기(paraphrasing)',      eb:'PARAPHRASE'},
+  {k:'CONNECTOR',    n:7,  t:'연결어(connector)',              eb:'CONNECTOR'},
+  {k:'POWER_TREE',   n:8,  t:'문장 간의 권력관계',                eb:'POWER TREE'},
+  {k:'POWER_STRUCT', n:9,  t:'구성요소 간의 권력관계 — grouping',  eb:'POWER STRUCTURE'},
+  {k:'LINE_LAB',     n:10, t:'문장 분석',                       eb:'LINE LAB'},
+  {k:'PHRASE_BANK',  n:11, t:'어휘와 해석',                     eb:'PHRASE BANK'},
+  {k:'ANSWER_KEY',   n:12, t:'MAIN에서 답을 뽑는다',             eb:'ANSWER KEY'},
+  {k:'SCORE_UP',     n:13, t:'성적 향상 포인트',                 eb:'SCORE-UP'},
+  {k:'EXAM_ROUTES',  n:14, t:'출제 가능 유형',                   eb:'EXAM ROUTES'},
+  {k:'DISTRACTOR',   n:15, t:'선지 함정',                       eb:'DISTRACTOR'},
+  {k:'WRAP_UP',      n:16, t:'이 글을 정리하면',                 eb:'WRAP-UP'},
+  {k:'QUALITY',      n:17, t:'분석 검증',                       eb:'QUALITY CHECK'},
+  {k:'WORKBOOK',     n:18, t:'확인 문제',                       eb:'WORKBOOK'},
+  {k:'RE_READ',      n:19, t:'다시 읽기',                       eb:'RE-READ'}
+];
+const SEC=Object.fromEntries(SECTIONS.map(s=>[s.k,s]));
+
+/* ================= 사용 설명서 ================= */
+const MANUAL={
+  lead:'이 프로그램은 영어 지문 한 개를 넣으면 "단락이론[수능편]"의 판정 기준 그대로 분석해 A4 학습지를 만들어 줍니다. 단락이론을 처음 접하시는 원장님도 이 설명서만 읽으면 결과물의 모든 칸을 학생에게 설명하실 수 있습니다.',
+  basic:[
+    '단락(paragraph)은 6~8개 문장이 하나의 주장을 전달하려고 모인 연합체입니다. 문장을 따로따로 해석하면 "해석은 되는데 답이 안 보이는" 상태가 됩니다.',
+    '단락이론은 이 문제를 두 가지 논리로 풉니다. 첫째 <b>연결성</b> — 단락은 절대 끊어지지 않는다(어휘·독해력 문제를 해결). 둘째 <b>권력관계</b> — 단락에는 1차 정보와 2차 정보의 차별이 있다(독해 속도 문제를 해결).',
+    '결과물의 앞부분은 연결성, 뒷부분은 권력관계를 다룹니다. 순서대로 읽히시면 됩니다.'
+  ],
+  terms:[
+    {t:'핵심어',e:'head',d:'글이 다루는 ①주제와 그에 대한 ②주장·개념(주제연관어)을 합친 말. 모든 단락은 "A는 B이다/하다"로 요약되는데, A가 주제, B가 주제연관어입니다.'},
+    {t:'대용어',e:'brother',d:'핵심어와 대등한 관계로, 핵심어를 대신할 수 있는 말. 반복어·대명사·동의어·비슷한 표현·비유적 표현으로 모양을 바꾸며 나타납니다.'},
+    {t:'종속어',e:'child',d:'핵심어의 부분집합. 핵심어가 일반적(general)이라면 종속어는 구체적(specific)이며 범위가 좁아집니다. 예시가 대표적입니다.'},
+    {t:'대립어',e:'enemy',d:'핵심어의 반대편에 놓이는 말. 흰색을 돋보이게 하려고 옆에 검은색을 두는 것과 같습니다. 대립어가 있으면 핵심어의 뜻이 더 선명해집니다.'},
+    {t:'1차 정보 / 2차 정보',e:'general / specific',d:'1차는 필자가 하고 싶은 말(주장·개념), 2차는 그것을 돕는 말(배경·설명·예시·근거). 2차는 빨리 넘겨도 되는 정보입니다.'},
+    {t:'구성요소',e:'component',d:'문장 몇 개를 묶은 덩어리. INTRO(도입) · MAIN(핵심) · SUPPORT(뒷받침) · ADDITION(부연) 네 가지입니다. 묶는 작업을 grouping이라 합니다.'},
+    {t:'연결어',e:'connector',d:'for example, however, therefore처럼 겉으로 드러나는 연결 장치. 권력을 아래로 내리거나(하향) 위로 올리거나(상향) 나란히 배분합니다(동등).'},
+    {t:'바꾸어 말하기',e:'paraphrasing',d:'어려운 표현을 같은 범주의 쉬운 표현으로 바꾸는 것. 모르는 단어가 나와도 지문 안에서 뜻을 알아내는 방법입니다.'}
+  ],
+  steps:[
+    {t:'Gemini API 키를 한 번만 넣습니다',d:'왼쪽 맨 위에 키를 붙여넣고 [저장]을 누르면 이 브라우저에 보관되어 다음부터는 다시 넣지 않아도 됩니다. 키는 서버로 전송되지 않습니다.'},
+    {t:'지문을 넣습니다',d:'텍스트를 붙여넣거나, 교재를 찍은 스크린샷을 입력칸에 그대로 Ctrl+V 하시면 됩니다. 이미지는 자동으로 글자를 읽어 들입니다.'},
+    {t:'지문 표기를 적습니다',d:'"2025 고1 32번"처럼 적으시면 결과물 우측 상단에 표시되고, 저장 파일 이름도 이 텍스트로 만들어집니다.'},
+    {t:'[단락이론으로 분석하기]를 누릅니다',d:'세 단계로 나눠 분석합니다. 지문 길이에 따라 30초~1분 정도 걸립니다.'},
+    {t:'교사용 / 학생용을 고르고 저장합니다',d:'결과 화면 위 버튼으로 전환합니다. [PDF로 저장]은 인쇄 대화상자를 열고, [HTML 내려받기]는 파일로 저장합니다. 파일 이름에 _교사용 또는 _학생용이 자동으로 붙습니다.'}
+  ],
+  modes:[
+    {t:'교사용',b:'해설 포함',li:['어휘 목록과 문장별 전문 해석','MAIN에서 뽑은 주제·요지·주장·제목·목적과 그 근거','성적 향상 포인트, 출제 가능 유형, 선지 함정','확인 문제의 정답과 해설','분석 검증 체크리스트']},
+    {t:'학생용',b:'문제 중심',li:['해석과 정답이 빠집니다','확인 문제는 답란만 나옵니다','마지막에 마킹 없는 원문(다시 읽기)이 붙습니다','수업 중 배부하거나 과제로 내주기에 적합합니다']}
+  ],
+  chapters:[
+    {k:'CONTEXT',
+     what:'지문을 읽기 전에 알아야 할 개념과 글의 전개 흐름을 두 줄로 정리한 칸입니다.',
+     why:'배경지식이 없어서 막히는 경우와 독해력이 부족해서 막히는 경우는 다릅니다. 앞의 원인을 미리 제거해 줍니다.',
+     read:['첫 줄 — 지문에 나오는 핵심 개념이 무엇인지 정의합니다.','둘째 줄 — "통념 제시 → 반전 → 원인 설명 → 결론"처럼 글이 어떤 순서로 전개되는지 알려줍니다.'],
+     use:'수업 도입 2분. 지문을 나눠주기 전에 이 두 줄만 읽어 주셔도 학생들의 이해 속도가 달라집니다.'},
+
+    {k:'READING_MAP',
+     what:'글 전체를 네 덩어리로 쪼개 카드 네 장으로 보여주는 지도입니다. 결과물에서 가장 먼저 보셔야 할 페이지입니다.',
+     why:'단락이론의 <b>구성요소(INTRO · MAIN · SUPPORT · ADDITION)</b>를 그림으로 옮긴 것입니다. 뼈대를 먼저 잡으면 문장에 매몰되지 않습니다.',
+     read:['카드 01 → 04이 글이 흘러가는 순서입니다.','카드 오른쪽 위의 <b>도입 / 핵심 / 뒷받침 / 부연</b>이 그 덩어리의 역할이고, 그 아래 "문장 1", "문장 3-6"이 해당 문장 번호입니다.','아래 파란 띠 <b>핵심 흐름</b>은 글의 논리를 화살표 한 줄로 압축한 것입니다.','맨 아래 <b>Q1 · Q2</b>는 학생이 읽으면서 스스로 던져야 할 질문입니다.'],
+     use:'해석하기 전에 이것부터 보여주세요. "이 글은 네 덩어리다"를 먼저 심는 것이 핵심입니다. Q1·Q2를 칠판에 적고 수업 끝에 답하게 하면 그대로 형성평가가 됩니다.'},
+
+    {k:'CORE_SUMMARY',
+     what:'글 전체를 영어 한 문장과 한국어 한 문장으로 압축한 칸입니다.',
+     why:'맨 아래 <b>한 줄 공식</b>이 단락이론의 핵심입니다. 모든 단락은 "A는 B이다/하다"로 요약되며, A가 주제이고 B가 주제연관어입니다.',
+     read:['영어 문장 — 요약문 완성 문제의 정답 형태와 비슷합니다.','한 줄 공식 — 이 문장의 A와 B가 뒤에 나올 핵심어와 그대로 연결됩니다.'],
+     use:'수업 마지막에 학생이 이 한 줄을 스스로 말할 수 있으면 그 지문은 끝난 것입니다.'},
+
+    {k:'COHESION',
+     what:'원문에 색을 입혀 어떤 말들이 서로 연결되어 있는지 한눈에 보여주는 페이지입니다.',
+     why:'단락이론의 첫 번째 논리인 <b>연결성</b>입니다. "단락은 절대 끊어지지 않는다" — 같은 것을 가리키는 말들이 모양만 바꿔 계속 이어집니다.',
+     read:['<b>파란 상자</b> = 핵심어(head)','<b>초록 밑줄</b> = 대용어(brother) — 핵심어와 같은 것을 가리키는 다른 표현','<b>노란 배경</b> = 종속어(child) — 핵심어의 부분·예시','<b>회색 상자</b> = 대립어(enemy) — 핵심어의 반대편','<b>기울임 + 점선</b> = 연결어(connector)','문장 앞 번호칸이 <b>검정</b>이면 1차 정보, <b>회색</b>이면 2차 정보입니다.'],
+     use:'화면에서는 색깔 버튼을 눌러 하나씩 껐다 켤 수 있습니다. 대용어만 켜고 "이게 전부 같은 말이다"를 보여주면 학생들이 놀랍니다. 인쇄물에는 모든 색이 그대로 나옵니다.'},
+
+    {k:'COHESION_MAP',
+     what:'핵심어가 무엇이고, 그것이 어떤 말들로 바뀌어 이어지는지 전부 정리한 표입니다.',
+     why:'핵심어(head)는 <b>①주제</b>와 <b>②주제연관어</b>를 합친 것입니다. 이 둘이 대용어·종속어로 모양을 바꾸며 단락 전체를 관통합니다.',
+     read:['<b>HEAD</b> 카드의 "/" 왼쪽이 주제, 오른쪽이 주제연관어입니다.','<b>BROTHER</b> 카드의 화살표 사슬이 핵심어가 바뀌어 온 경로입니다.','<b>CHILD</b>는 핵심어의 부분집합이라 범위가 좁습니다. 이것을 주제로 착각하면 오답을 고릅니다.','<b>ENEMY</b>는 핵심어의 반대말입니다. 비어 있을 수도 있습니다.','아래 표에 brother1, child1처럼 번호를 붙여 전부 나열하고, 각각이 반복어인지 대명사인지 비유인지 성격까지 밝힙니다.','<b>권력이동(power shift)</b> 배너가 뜨면 — 대립어가 먼저 나오고 뒤에 진짜 핵심어가 등장해 앞의 말이 2차 정보로 강등된 반전형 지문입니다.'],
+     use:'빈칸 추론이 안 풀리는 학생에게 이 표를 보여주세요. 빈칸 자리는 대개 대용어 자리이고, 정답은 앞뒤에 이미 다른 말로 나와 있습니다.'},
+
+    {k:'PARAPHRASE',
+     what:'어려운 표현을 지문 안의 쉬운 표현으로 바꿔치기하는 경로를 보여줍니다.',
+     why:'연결성의 실전 활용입니다. 핵심어와 대용어는 같은 것을 가리키므로 서로 바꿔도 뜻이 유지됩니다. 모르는 단어가 나와도 뜻을 유추할 수 있는 이유입니다.',
+     read:['왼쪽 파란 글씨 — 학생이 막히는 표현','오른쪽 — 그것과 같은 것을 가리키는 쉬운 표현','아래 회색 줄 — 왜 둘이 같은 것인지, 어떤 연결을 타고 왔는지'],
+     use:'"단어를 몰라서 못 풀겠어요"라는 학생에게 쓰는 페이지입니다. 사전을 찾는 대신 지문 안에서 답을 찾는 습관을 만들어 줍니다.'},
+
+    {k:'CONNECTOR',
+     what:'지문에 나온 연결어를 방향별로 분류하고 각각이 만드는 권력 변화를 설명한 표입니다.',
+     why:'연결어는 내용이 아니라 <b>형태로 드러나는</b> 연결 장치입니다. 겉에 보이기 때문에 가장 빨리 찾을 수 있는 단서입니다.',
+     read:['<b>↓ 1차→2차 (하향)</b> — 권력을 끌어내립니다. 뒤에 오는 것이 2차 정보. 설명(that is), 강화(in fact), 예시(for example), 근거(This is because)','<b>↑ 2차→1차 (상향)</b> — 권력을 끌어올립니다. 뒤에 오는 것이 1차 정보. 인과(therefore), 전환(however)','<b>≒ 동등</b> — 앞뒤를 같은 무게로 나란히 놓습니다. 병렬(also, similarly)','맨 오른쪽 "4→5"는 몇 번 문장에서 몇 번 문장으로 넘어가는 자리인지 나타냅니다.'],
+     use:'연결어 넣기 문제의 근거가 그대로 됩니다. 왼쪽 사이드바 [연결어 사전]에 책의 전체 목록이 들어 있으니 인쇄해 나눠주셔도 좋습니다.'},
+
+    {k:'POWER_TREE',
+     what:'어느 문장이 1차 정보이고 어느 문장이 그것에 딸린 2차 정보인지 들여쓰기로 그린 나무입니다.',
+     why:'단락이론의 두 번째 논리인 <b>권력관계</b>입니다. "단락에는 1차 정보와 2차 정보의 차별이 있다" — 모든 문장을 똑같은 힘으로 읽으니 시간이 부족한 것입니다.',
+     read:['검정 <b>1차</b> 배지 = 필자의 주장·개념. 회색 <b>2차</b>는 그 아래로 들여쓰기됩니다.','각 줄 밑 파란 글씨가 판정 결과입니다. 1차 뒤에 오는 2차는 <b>설명 · 예시 · 근거</b> 중 하나, 1차 앞에 오는 2차는 <b>문제제기 · 반대내용 · 사전지식</b> 중 하나입니다.','위쪽 배지 <b>TYPE1(직렬결합)</b>은 사슬처럼 한 줄로 내려가는 구조, <b>TYPE2(다중결합)</b>는 1차 하나 아래에 2차 여럿이 나란히 붙는 구조입니다.'],
+     use:'독해 속도가 느린 학생에게 꼭 필요한 페이지입니다. 2차 정보는 빠르게 넘겨도 답을 고르는 데 지장이 없다는 것을 눈으로 보여주세요.'},
+
+    {k:'POWER_STRUCT',
+     what:'문장들을 INTRO / MAIN / SUPPORT / ADDITION 네 덩어리로 묶고, 왜 그렇게 묶었는지 밝힌 페이지입니다.',
+     why:'문장 몇 개를 묶어 덩어리로 만드는 것을 <b>grouping(문장 묶기)</b>이라 합니다. 시험을 칠 때는 MAIN과 나머지를 구분하는 grouping만으로 충분합니다.',
+     read:['파란 띠에 판정 패턴이 "INTRO(s1) → MAIN(s2) → SUPPORT(s3-s6) → ADDITION(s7-s8)" 형태로 표시됩니다.','<b>INTRO</b> = MAIN 앞의 배경(2차·old) · <b>MAIN</b> = 가장 중요한 주장(1차·new) · <b>SUPPORT</b> = MAIN을 구체화(2차) · <b>ADDITION</b> = MAIN의 반복이나 추가정보','카드의 Gen/Spe/Old/New는 그 덩어리가 일반적인지 구체적인지, 구정보인지 신정보인지 나타냅니다.','아래에는 덩어리별 원문과 <b>덩어리 안의 권력관계</b>가 붙습니다.','MAIN + SUPPORT + ADDITION만 있으면 단락유형1(두괄식), 앞에 INTRO가 붙으면 단락유형2입니다.'],
+     use:'주제 · 요지 · 제목 문제는 MAIN 한 덩어리만 정확히 잡으면 끝납니다. ADDITION은 빼도 글이 무너지지 않고 MAIN을 뒤집지도 못한다는 점을 알려주세요.'},
+
+    {k:'LINE_LAB',
+     what:'문장 하나하나를 의미 단위로 잘라 해석 · 문맥 · 구문 · 시험 포인트까지 붙인 페이지입니다.',
+     why:'앞 페이지들이 숲을 보는 것이라면 이 페이지는 나무를 보는 것입니다. 구조를 잡은 뒤에 보셔야 효과가 있습니다.',
+     read:['왼쪽 표 — 끊어읽기. 영어 조각과 한글 대응을 짝지어 놓았습니다.','오른쪽 — 한글 해석 / 문맥 설명(이 문장이 단락에서 하는 일) / 연결 관계(앞뒤 문장과의 권력관계)','아래 파란 상자 — 구문 포인트','아래 노란 상자 — 시험 포인트','노란 테두리에 <b>◎ 핵심 문장</b> 표시가 붙으면 MAIN이거나 결론 문장입니다.'],
+     use:'개별 첨삭이나 보충 수업용입니다. 어디서 끊어 읽어야 할지 모르는 학생에게는 왼쪽 표만 따로 보여주셔도 좋습니다.'},
+
+    {k:'PHRASE_BANK',
+     what:'중요 어휘 목록과 문장별 전문 해석입니다. 교사용에만 나옵니다.',
+     why:'어휘는 단어·짧은 뜻·보충 설명 세 칸으로 되어 있어, 뜻만 외우지 않고 쓰임까지 알 수 있습니다.',
+     read:['어휘는 지문 등장 순서로 정렬됩니다.','해석은 문장 번호와 짝지어져 있어 문장 분석 페이지와 대조하기 좋습니다.'],
+     use:'해석을 먼저 주면 학생이 영어를 읽지 않습니다. 문제를 풀리고 채점한 뒤에 배부하시기를 권합니다.'},
+
+    {k:'ANSWER_KEY',
+     what:'주제 · 요지 · 주장 · 제목 · 목적을 각각 뽑고, 그 근거가 어디인지 밝힌 카드입니다.',
+     why:'수능 문제의 30%가 권력관계를 묻습니다. 이 유형의 답은 전부 MAIN 안에 있습니다.',
+     read:['굵은 글씨가 답, 아래 회색 글씨가 "어느 구성요소의 어느 표현 때문인지"입니다.','주제는 무엇에 대한 글인지, 요지는 그래서 무슨 말인지, 주장은 그래서 어떻게 하라는 것인지의 차이가 있습니다.'],
+     use:'근거 문장을 반드시 같이 읽히세요. 답만 외우면 다음 지문에서 또 틀립니다.'},
+
+    {k:'SCORE_UP',
+     what:'이 지문에서 점수를 올리는 실전 착안점 세 가지입니다.',
+     why:'요령이 아니라 이 지문에서 실제로 작동한 단락이론 개념을 짚어 줍니다.',
+     read:['01 · 02 · 03 순서로 중요도가 매겨져 있습니다.'],
+     use:'수업 마무리 3분 정리용으로 그대로 쓰시면 됩니다.'},
+
+    {k:'EXAM_ROUTES',
+     what:'이 지문으로 만들 수 있는 문제 유형과 각각의 근거입니다.',
+     why:'수능 문제는 크게 세 갈래입니다. <b>연결성 40% · 권력관계 30% · 독해력 30%</b>. 태그에 이 분류가 함께 표시됩니다.',
+     read:['태그의 "빈칸 · 연결성"은 문제 형식이 빈칸이고 분류가 연결성이라는 뜻입니다.','아래 "근거"에 어느 문장을 써야 하는지 적혀 있습니다.'],
+     use:'자체 시험지를 만드실 때 그대로 문항 설계도로 쓰실 수 있습니다.'},
+
+    {k:'DISTRACTOR',
+     what:'이 지문에서 만들어질 법한 매력적인 오답의 패턴입니다.',
+     why:'오답은 아무렇게나 만들어지지 않습니다. 종속어를 주제로 부풀리거나, 대립어를 정답처럼 꾸미는 식으로 만들어집니다.',
+     read:['⚠ 표시 한 줄이 함정 하나입니다.'],
+     use:'오답 노트 지도용입니다. 학생이 왜 그 선지에 끌렸는지 설명해 줄 수 있게 됩니다.'},
+
+    {k:'WRAP_UP',
+     what:'글 전체를 한국어 세 문장으로 압축한 정리입니다.',
+     why:'요약은 MAIN을 중심으로 SUPPORT의 핵심만 남기는 작업입니다.',
+     read:['1 → 2 → 3이 글의 논리 순서와 일치합니다.'],
+     use:'다음 시간 복습 확인용 구술 질문으로 쓰기 좋습니다.'},
+
+    {k:'QUALITY',
+     what:'분석이 제대로 됐는지 프로그램이 스스로 점검한 결과입니다.',
+     why:'AI 분석의 가장 흔한 사고는 지문 일부가 누락되는 것입니다. 그것부터 확인합니다.',
+     read:['원문 문장 수와 분석 문장 수가 같은지','구성요소 판정이 근거와 함께 나왔는지','대용어 · 종속어 · 연결어를 각각 몇 개 추적했는지','출제 유형을 몇 건 제시했는지'],
+     use:'배부 전 1초만 확인하세요. 문장 수가 다르면 지문이 잘려 들어간 것이니 다시 붙여넣고 재분석하시면 됩니다.'},
+
+    {k:'WORKBOOK',
+     what:'단락이론 용어로 묻는 확인 문제입니다.',
+     why:'핵심어 찾기 · 구성요소 판정 · 연결어 · 빈칸 · 요지 등 배운 개념을 바로 확인합니다.',
+     read:['문제 오른쪽 파란 글씨가 어떤 개념을 묻는 문제인지 알려줍니다.','교사용에는 정답과 해설이 붙고, 학생용에는 답란만 나옵니다.'],
+     use:'수업 마지막 10분 또는 과제로 쓰시면 됩니다.'},
+
+    {k:'RE_READ',
+     what:'마킹을 모두 지운 원문입니다. 학생용에만 나옵니다.',
+     why:'도움 없이 스스로 구조를 잡아 보는 마지막 단계입니다.',
+     read:['색도 번호도 없는 순수한 원문입니다.'],
+     use:'학생에게 직접 네 덩어리로 나눠 보게 하시고, 앞의 시각 구조도와 맞춰 보게 하세요.'}
+  ]
+};
+
+function manualHtml(){
+  const M=MANUAL;
+  return `<div class="man" id="manDoc">
+  <div class="mhead">
+    <div class="mk">ZoopsBooks 단락이론</div>
+    <h1>사용 설명서</h1>
+    <p>${M.lead}</p>
+  </div>
+
+  <h2 class="mt"><span class="bar"></span>1. 단락이론이 무엇인가</h2>
+  ${M.basic.map(x=>`<p class="mp">${x}</p>`).join('')}
+
+  <h2 class="mt"><span class="bar"></span>2. 알아 두실 용어 여덟 개</h2>
+  <div class="terms">
+    ${M.terms.map(t=>`<div class="term"><b>${esc(t.t)}<span>${esc(t.e)}</span></b><p>${esc(t.d)}</p></div>`).join('')}
+  </div>
+
+  <h2 class="mt"><span class="bar"></span>3. 사용 순서</h2>
+  <div class="steps">
+    ${M.steps.map((s,i)=>`<div class="stp"><span class="n">${i+1}</span>
+      <div><b>${esc(s.t)}</b><p>${esc(s.d)}</p></div></div>`).join('')}
+  </div>
+
+  <h2 class="mt"><span class="bar"></span>4. 교사용과 학생용의 차이</h2>
+  <div class="modewrap">
+    ${M.modes.map(m=>`<div class="modecard"><div class="t">${esc(m.t)}<em>${esc(m.b)}</em></div>
+      <ul>${m.li.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}
+  </div>
+  <p class="mp" style="margin-top:8px">저장하실 때 파일 이름은 <b>지문 표기 + _교사용 / _학생용</b>으로 자동 생성됩니다.
+     예를 들어 지문 표기에 "2025 고1 32번"이라고 적고 학생용으로 저장하시면 <b>2025 고1 32번_학생용</b>이 됩니다.</p>
+
+  <h2 class="mt"><span class="bar"></span>5. 결과물 각 페이지 읽는 법</h2>
+  <p class="mp">아래 번호는 학습지에 표시된 번호와 같습니다. 학습지에서 <b>7 연결어</b>가 보이면 이 설명서의 7번을 찾아보시면 됩니다. 지문에 따라 없는 칸(예: 대립어나 연결어가 없는 지문)은 학습지에서 통째로 빠지며, 이때도 나머지 칸의 번호는 바뀌지 않습니다. 11~17번은 교사용에만, 19번은 학생용에만 나옵니다.</p>
+  ${M.chapters.slice().sort((a,b)=>SEC[a.k].n-SEC[b.k].n).map(c=>`<div class="chap">
+    <div class="ch-h"><span class="num">${SEC[c.k].n}</span><h3>${esc(SEC[c.k].t)}</h3><span class="eb">${esc(SEC[c.k].eb)}</span></div>
+    <p class="what">${esc(c.what)}</p>
+    <div class="why"><b>단락이론 근거 · </b>${c.why}</div>
+    <div class="rd"><div class="lbl">읽는 법</div><ul>${c.read.map(r=>`<li>${r}</li>`).join('')}</ul></div>
+    <div class="use"><b>수업 활용</b><span>${esc(c.use)}</span></div>
+  </div>`).join('')}
+
+  <h2 class="mt"><span class="bar"></span>6. 자주 묻는 것</h2>
+  <p class="mp"><b>분석이 실패했다고 나옵니다.</b> API 키가 맞는지, 지문에 한글 발문이나 선택지가 섞이지 않았는지 확인하세요. 영어 본문만 넣으시면 됩니다.</p>
+  <p class="mp"><b>분석 결과가 마음에 들지 않습니다.</b> 같은 지문으로 다시 실행하면 판정이 조금씩 달라집니다. 모델을 gemini-2.5-pro로 두시면 판정이 더 안정적입니다.</p>
+  <p class="mp"><b>인쇄하면 색이 안 나옵니다.</b> 인쇄 대화상자에서 "배경 그래픽"을 켜 주세요. 여백은 "기본값"으로 두시면 됩니다.</p>
+  <p class="mp"><b>스크린샷이 잘 안 읽힙니다.</b> 지문 부분만 잘라서 넣으시고, 글자가 선명하도록 확대해서 캡처하시면 정확도가 올라갑니다.</p>
+
+  <div class="footline">문장은 따로 읽지 않는다. 하나의 메시지와 권력 구조로 읽는다.</div>
+</div>`;
+}
+
+function openManual(){
+  if(!$('#manBody').innerHTML.trim()) $('#manBody').innerHTML=manualHtml();
+  $('#manModal').classList.add('on');
+}
+function printManual(){
+  if(!$('#manBody').innerHTML.trim()) $('#manBody').innerHTML=manualHtml();
+  const t=document.title;
+  document.title='ZoopsBooks 단락이론 사용설명서';
+  document.body.classList.add('printing-manual');
+  const done=()=>{document.body.classList.remove('printing-manual');document.title=t;window.removeEventListener('afterprint',done)};
+  window.addEventListener('afterprint',done);
+  window.print();
+  setTimeout(done,1500);
+}
+function exportManual(){
+  if(!$('#manBody').innerHTML.trim()) $('#manBody').innerHTML=manualHtml();
+  const css=[...document.querySelectorAll('style')].map(s=>s.textContent).join('\n');
+  const doc=`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZoopsBooks 단락이론 사용 설명서</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>${css}
+body{background:#EEF3F6;padding:20px 10px}
+.man{border:1px solid var(--rule);border-radius:12px}
+@media print{body{padding:0}.man{border:0;border-radius:0}}</style></head>
+<body>${manualHtml()}</body></html>`;
+  downloadHtml(doc,'ZoopsBooks_단락이론_사용설명서.html');
+}
+
+/* ================= 파일명 ================= */
+function sanitize(s){
+  return String(s||'').replace(/[\\/:*?"<>|\n\r\t]/g,'').replace(/\s+/g,' ').trim().slice(0,60);
+}
+function modeKo(){ return document.body.classList.contains('mode-student')?'학생용':'교사용'; }
+function fileBase(){
+  const src=sanitize(STATE?.source || $('#srcInput').value || '');
+  const base=src || sanitize(STATE?.a?.titleKo) || 'ZoopsBooks_단락이론';
+  return `${base}_${modeKo()}`;
+}
+function downloadHtml(text,name){
+  const b=new Blob([text],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),3000);
+}
+
+/* ================= 마킹 엔진 ================= */
+function buildMarks(A){
+  const marks=[];
+  const push=(t,cls)=>{const s=String(t||'').trim(); if(s.length>1) marks.push({text:s,cls})};
+  push(A.head?.topic,'m-head'); push(A.head?.topicRelated,'m-head');
+  arr(A.headGroup?.brothers).forEach(b=>push(b.text,'m-brother'));
+  arr(A.headGroup?.children).forEach(c=>push(c.text,'m-child'));
+  const eg=A.enemyGroup||{};
+  push(eg.enemy,'m-enemy');
+  arr(eg.brothers).forEach(b=>push(b.text,'m-enemy'));
+  arr(eg.children).forEach(c=>push(c.text,'m-enemy'));
+  arr(A.connectors).forEach(c=>{const s=String(c.word||'').trim();
+    if(s) marks.push({text:s,cls:'m-conn '+(['down','up','equi'].includes(c.dir)?c.dir:'down')})});
+  const seen=new Set();
+  return marks.filter(m=>{const k=m.text.toLowerCase()+'|'+m.cls; if(seen.has(k))return false; seen.add(k); return true})
+              .sort((a,b)=>b.text.length-a.text.length);
+}
+function indexOfSmart(hay,needle){
+  let i=hay.indexOf(needle);
+  if(i>=0&&hay.slice(i,i+needle.length).indexOf('\u0000')<0) return i;
+  const li=hay.toLowerCase().indexOf(needle.toLowerCase());
+  if(li>=0&&hay.slice(li,li+needle.length).indexOf('\u0000')<0) return li;
+  return -1;
+}
+function markSentence(text,marks){
+  const slots=[]; let work=text;
+  marks.forEach(m=>{
+    let guard=0;
+    while(guard++<12){
+      const idx=indexOfSmart(work,m.text); if(idx<0) break;
+      const token=`\u0000${slots.length}\u0000`;
+      slots.push(`<mark class="${m.cls}">${esc(work.substr(idx,m.text.length))}</mark>`);
+      work=work.slice(0,idx)+token+work.slice(idx+m.text.length);
+    }
+  });
+  let out=esc(work);
+  slots.forEach((h,i)=>{out=out.split(`\u0000${i}\u0000`).join(h)});
+  return out;
+}
+
+/* ================= 렌더 ================= */
+let STATE=null;
+const ROLE_KO={INTRO:'도입',MAIN:'핵심',SUPPORT:'뒷받침',ADDITION:'부연'};
+const secH=(key,lead)=>{const s=SEC[key];return `<h3><span class="n">${s.n}</span>${esc(s.t)}<span class="eb">${esc(s.eb)}</span></h3>`+(lead?`<p class="lead">${esc(lead)}</p>`:'');};
+const labBox=key=>{const s=SEC[key];return `<div class="lab"><div class="eb"><span class="num">${s.n}</span>${esc(s.eb)}</div><b>${esc(s.t)}</b></div>`;};
+
+function render(state){
+  STATE=state;
+  const A=state.a,B=state.b,C=state.c;
+  const marks=buildMarks(A);
+  const powerBy=Object.fromEntries(arr(B.power).map(p=>[p.id,p]));
+  const lineBy=Object.fromEntries(arr(C.lines).map(l=>[l.id,l]));
+  const transBy=Object.fromEntries(arr(A.translation).map(t=>[t.id,t.ko]));
+  const sentBy=Object.fromEntries(arr(A.sentences).map(s=>[s.id,s.text]));
+  const sents=arr(A.sentences);
+  const hg=A.headGroup||{},eg=A.enemyGroup||{},rm=B.readingMap||{},pt=B.paragraphType||{},an=B.answers||{};
+
+  const html=`<div class="sheet" id="sheet">
+
+  <div class="docmark">
+    <div class="zb">ZB</div>
+    <div><b>ZoopsBooks 단락이론</b><span>완전 분석 리포트</span></div>
+    <div class="src">${esc(state.source||'')}</div>
+  </div>
+
+  <div class="sheet-head">
+    <div class="t">
+      <div class="mark">${esc(B.purposeType?.value||'단락 분석')}${B.purposeType?.subKo?' · '+esc(B.purposeType.subKo):''}</div>
+      <h2>${esc(A.titleKo||'단락 분석')}</h2>
+      <div class="en">${esc(A.titleEn||'')}</div>
+    </div>
+    <div class="tags">
+      <span class="tag">${esc((pt.value||'').split(':')[0]||'')}</span>
+      <span class="tag">${esc(B.combineType?.value||'')}</span>
+      <span class="tag grey">원문 ${sents.length}문장</span>
+    </div>
+  </div>
+
+  <!-- 배경지식 -->
+  <section class="sec">
+    <div class="lbox">
+      ${labBox('CONTEXT')}
+      <div class="bd"><p>${esc(A.context?.defKo||'')}</p><p>${esc(A.context?.flowKo||'')}</p></div>
+    </div>
+  </section>
+
+  <!-- 시각 구조도 -->
+  <section class="sec">
+    ${secH('READING_MAP','네 덩어리로 글의 뼈대를 먼저 잡는다.')}
+    <div class="map">
+      <div class="ttl">${esc(rm.flowTitleKo||'')}</div>
+      <div class="sub">${esc(rm.flowSubKo||'')}</div>
+      <div class="flow">
+        ${arr(rm.steps).slice(0,4).map((s,i)=>`
+          ${i?'<div class="arrow">→</div>':''}
+          <div class="fcard c${i+1}">
+            <div class="hd"><div class="no">${esc(s.no||('0'+(i+1)))}</div>
+              <div class="meta">${esc(s.roleKo||'')}<br>${esc(s.sidsKo||'')}</div></div>
+            <div class="t">${esc(s.titleKo||'')}</div>
+            <div class="d">${esc(s.lineKo||'')}</div>
+          </div>`).join('')}
+      </div>
+      ${rm.coreKo?`<div class="coreline"><span class="k">핵심 흐름</span><span class="v">${esc(rm.coreKo)}</span></div>`:''}
+      ${arr(rm.questions).length?`<div class="qrow">${arr(rm.questions).slice(0,2).map((q,i)=>`<div class="q"><b>Q${i+1}</b>${esc(q)}</div>`).join('')}</div>`:''}
+    </div>
+  </section>
+
+  <!-- 핵심 요약 -->
+  <section class="sec">
+    <div class="lbox cream">
+      ${labBox('CORE_SUMMARY')}
+      <div class="bd">
+        <p style="font-family:var(--en);font-size:12px;color:var(--ink)">${esc(A.coreEn||'')}</p>
+        <p>${esc(A.coreKo||'')}</p>
+        <p style="color:var(--pk-deep);font-weight:700">한 줄 공식 · ${esc(A.summaryKo||'')}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 지문 마킹 -->
+  <section class="sec pbreak">
+    ${secH('COHESION','핵심어가 대용어·종속어로 모양을 바꾸며 이어지고, 대립어가 이를 선명하게 만든다.')}
+    <div class="legend no-print">
+      <span class="lg" data-k="head"><i></i>핵심어 head</span>
+      <span class="lg" data-k="brother"><i></i>대용어 brother</span>
+      <span class="lg" data-k="child"><i></i>종속어 child</span>
+      <span class="lg" data-k="enemy"><i></i>대립어 enemy</span>
+      <span class="lg" data-k="conn"><i></i>연결어 connector</span>
+    </div>
+    <div class="passage">
+      ${sents.map(s=>{const p=powerBy[s.id];const lv=p?(p.level===1?'p1':'p2'):'';
+        return `<span class="sent"><span class="sn ${lv}">${esc(s.id.replace('s',''))}</span>${markSentence(s.text,marks)}</span> `}).join('')}
+    </div>
+  </section>
+
+  <!-- 연결성 지도 -->
+  <section class="sec">
+    ${secH('COHESION_MAP')}
+    <div class="banner">모든 단락은 “A는 B이다/하다”로 요약된다</div>
+    <div class="g2">
+      <div class="cohcard"><div class="hd"><span class="pill head">HEAD</span><b>핵심어</b></div>
+        <div class="en">${esc(A.head?.topic||'')}${A.head?.topicRelated?` <span style="color:var(--ink-3)">/</span> ${esc(A.head.topicRelated)}`:''}</div>
+        <div class="ko">①주제 + ②주제연관어. ${esc(A.head?.noteKo||'')}</div></div>
+      <div class="cohcard"><div class="hd"><span class="pill brother">BROTHER</span><b>대용어 ${arr(hg.brothers).length}개</b></div>
+        <div class="chain">${arr(hg.brothers).map(b=>esc(b.text)).join('<i>→</i>')||'<span style="color:var(--ink-3)">없음</span>'}</div>
+        <div class="ko">모양을 바꾸며 핵심어를 대신한다.</div></div>
+      <div class="cohcard"><div class="hd"><span class="pill child">CHILD</span><b>종속어 ${arr(hg.children).length}개</b></div>
+        <div class="chain">${arr(hg.children).map(c=>esc(c.text)).join('<i>·</i>')||'<span style="color:var(--ink-3)">없음</span>'}</div>
+        <div class="ko">핵심어의 부분집합. general → specific.</div></div>
+      <div class="cohcard"><div class="hd"><span class="pill enemy">ENEMY</span><b>대립어</b></div>
+        <div class="en">${eg.enemy?esc(eg.enemy):'<span style="color:var(--ink-3);font-family:var(--sans);font-size:10px">뚜렷한 대립어 없음</span>'}</div>
+        <div class="ko">${esc(eg.noteKo||'')}</div></div>
+    </div>
+    ${eg.powerShift?`<div class="banner" style="margin-top:10px;border-color:var(--enemy);color:var(--enemy)">권력이동(power shift) — ${esc(eg.powerShiftKo||'대립어가 먼저 나온 뒤 진짜 핵심어가 등장해 앞의 말이 2차 정보로 강등된다.')}</div>`:''}
+
+    <div class="grp-title head"><span class="dot"></span>head group · enemy group</div>
+    <table class="zt">
+      <thead><tr><th style="width:82px">구분</th><th>표현</th><th class="no">성격</th></tr></thead>
+      <tbody>
+        <tr><td class="k">head</td><td class="en" style="font-weight:700">${esc(A.head?.topic||'')} / ${esc(A.head?.topicRelated||'')}</td><td class="no">핵심어</td></tr>
+        ${arr(hg.brothers).map((b,i)=>`<tr><td class="k">brother${i+1}</td><td class="en">${esc(b.text)}</td><td class="no">${esc(b.kindKo||'')}${b.forKo?' · '+esc(b.forKo):''}</td></tr>`).join('')}
+        ${arr(hg.children).map((c,i)=>`<tr><td class="k">child${i+1}</td><td class="en">${esc(c.text)}</td><td class="no">${esc(c.noteKo||'부분집합')}</td></tr>`).join('')}
+        ${eg.enemy?`<tr><td class="k" style="color:var(--enemy)">enemy</td><td class="en" style="font-weight:700">${esc(eg.enemy)}</td><td class="no">대립어</td></tr>`:''}
+        ${arr(eg.brothers).map((b,i)=>`<tr><td class="k" style="color:var(--enemy)">e-brother${i+1}</td><td class="en">${esc(b.text)}</td><td class="no">${esc(b.kindKo||'')}</td></tr>`).join('')}
+        ${arr(eg.children).map((c,i)=>`<tr><td class="k" style="color:var(--enemy)">e-child${i+1}</td><td class="en">${esc(c.text)}</td><td class="no">${esc(c.noteKo||'')}</td></tr>`).join('')}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 바꾸어 말하기 -->
+  ${arr(A.paraphrase).length?`<section class="sec">
+    ${secH('PARAPHRASE','어려운 어휘나 막히는 문맥은 같은 범주의 쉬운 말로 치환해서 해결한다.')}
+    <div class="para">
+      ${A.paraphrase.map(p=>`<div class="prow">
+        <div class="top"><span class="a">${esc(p.hard)}</span><span class="ar">→</span><span class="b">${esc(p.easy)}</span></div>
+        <div class="p">${esc(p.pathKo||'')}</div></div>`).join('')}
+    </div>
+  </section>`:''}
+
+  <!-- 연결어 -->
+  ${arr(A.connectors).length?`<section class="sec">
+    ${secH('CONNECTOR','내용이 아니라 형태로 드러나는 연결 장치. 권력관계를 조절한다.')}
+    <div class="conn">
+      <div class="ch"><span style="flex:0 0 60px">방향</span><span style="flex:0 0 104px">연결어</span>
+        <span style="flex:0 0 70px">기능</span><span style="flex:1">권력 변화</span><span>위치</span></div>
+      ${A.connectors.map(c=>{
+        const d=['down','up','equi'].includes(c.dir)?c.dir:'down';
+        const kr=d==='down'?'↓ 1차→2차':d==='up'?'↑ 2차→1차':'≒ 동등';
+        return `<div class="crow"><span class="dirp ${d}">${kr}</span>
+          <span class="w">${esc(c.word||'')}</span><span class="f">${esc(c.funcKo||'')}</span>
+          <span class="d">${esc(c.noteKo||'')}</span>
+          <span class="s">${esc(String(c.fromSid||'').replace('s',''))}→${esc(String(c.toSid||'').replace('s',''))}</span></div>`;
+      }).join('')}
+    </div>
+  </section>`:''}
+
+  <!-- 문장 간 권력관계 -->
+  <section class="sec pbreak">
+    ${secH('POWER_TREE','1차 정보(general·new)와 2차 정보(specific·old)를 가른다.')}
+    ${B.combineType?.value?`<div class="typebadge">${esc(B.combineType.value)}</div>
+      <p style="font-size:10.5px;color:var(--ink-3);margin:0 0 10px">${esc(B.combineType.whyKo||'')}</p>`:''}
+    <div class="tree">${tree(sents,powerBy)}</div>
+  </section>
+
+  <!-- 구성요소 -->
+  <section class="sec">
+    ${secH('POWER_STRUCT',(pt.value||'')+' · '+(pt.structureKo||''))}
+    <div class="patternbar"><span class="k">판정 패턴</span>
+      <span class="v">${esc(pt.patternKo||'MAIN → SUPPORT → ADDITION')}</span>
+      <span class="x">${esc(B.combineType?.value||'')}</span></div>
+    <div class="comps">
+      ${arr(B.grouping).map(g=>`<div class="ccard ${esc(g.role||'MAIN')}">
+        <div class="r">${esc(g.label||g.role||'')}</div>
+        <div class="t">${esc(g.titleKo||ROLE_KO[g.role]||'')}</div>
+        <div class="s">${esc(arr(g.sids).map(x=>'문장 '+String(x).replace('s','')).join(', '))} · ${esc(g.genSpe||'')}</div>
+        <div class="d">${esc(g.subKo||'')}</div></div>`).join('')}
+    </div>
+    ${arr(B.grouping).map(g=>`<div class="comp">
+      <div class="h"><span class="cbadge ${esc(g.role||'MAIN')}">${esc(g.label||g.role||'')}</span>
+        <span class="role">${esc(g.genSpe||'')}${g.subKo?' · '+esc(g.subKo):''}</span></div>
+      <div class="body">${arr(g.sids).map(id=>{const t=sentBy[id]; if(!t) return '';
+        return `<span class="sn ${powerBy[id]?.level===1?'p1':'p2'}">${esc(String(id).replace('s',''))}</span>${markSentence(t,marks)} `}).join('')}</div>
+      ${(g.whyKo||g.innerKo)?`<div class="note">${esc(g.whyKo||'')}${g.innerKo?` <b>[덩어리 안의 권력관계]</b> ${esc(g.innerKo)}`:''}</div>`:''}
+    </div>`).join('')}
+  </section>
+
+  <!-- 문장 분석 -->
+  <section class="sec pbreak">
+    ${secH('LINE_LAB','원문 → 의미 단위 → 해석 → 문맥 → 시험')}
+    ${sents.map(s=>lineCard(s,lineBy[s.id]||{},powerBy[s.id]||{},B)).join('')}
+  </section>
+
+  <!-- 어휘와 해석 -->
+  <section class="sec pbreak t-only">
+    ${secH('PHRASE_BANK',`중요 어휘 ${arr(A.vocab).length}개`)}
+    <div class="vgrid">
+      ${arr(A.vocab).map(v=>`<div class="vrow"><span class="w">${esc(v.w)}</span><span class="k">${esc(v.k)}</span><span class="d">${esc(v.d||'')}</span></div>`).join('')}
+    </div>
+    <div class="grp-title head" style="margin-top:14px"><span class="dot"></span>전문 해석</div>
+    <div class="trans">${sents.map(s=>`<p><b>${esc(s.id.replace('s',''))}.</b> ${esc(transBy[s.id]||'')}</p>`).join('')}</div>
+  </section>
+
+  <!-- 답 도출 -->
+  <section class="sec pbreak t-only">
+    ${secH('ANSWER_KEY','주제·요지·제목·목적은 모두 MAIN의 핵심어에서 나온다.')}
+    ${[['주제 (topic)',an.topicKo,an.topicReasonKo],['요지 (main idea)',an.gistKo,an.gistReasonKo],
+       ['필자의 주장',an.claimKo,an.claimReasonKo],['제목 (title)',an.titleKo,an.titleReasonKo],
+       ['글의 목적',an.purposeKo,an.purposeReasonKo]]
+      .filter(r=>r[1]).map(r=>`<div class="acard"><div class="lbl">${esc(r[0])}</div>
+        <div class="val">${esc(r[1])}</div>${r[2]?`<div class="rz">${esc(r[2])}</div>`:''}</div>`).join('')}
+  </section>
+
+  <!-- 성적 향상 -->
+  <section class="sec t-only">
+    ${secH('SCORE_UP')}
+    <div class="score">
+      ${arr(B.scoreUp).slice(0,3).map((s,i)=>`<div class="scard"><div class="no">0${i+1}</div>
+        <div class="t">${esc(s.titleKo||'')}</div><div class="d">${esc(s.descKo||'')}</div></div>`).join('')}
+    </div>
+  </section>
+
+  <!-- 출제 유형 -->
+  <section class="sec t-only">
+    ${secH('EXAM_ROUTES','연결성 40% · 권력관계 30% · 독해력 30%')}
+    <div class="routes">
+      ${arr(B.examRoutes).slice(0,4).map(r=>`<div class="rcard">
+        <span class="tp">${esc(r.catKo||'')}${r.typeKo?' · '+esc(r.typeKo):''}</span>
+        <div class="q">${esc(r.qKo||'')}</div>
+        <div class="b">근거 · ${esc(r.basisKo||'')}</div></div>`).join('')}
+    </div>
+  </section>
+
+  <!-- 선지 함정 -->
+  ${arr(B.distractors).length?`<section class="sec t-only">
+    <div class="lbox rose">
+      ${labBox('DISTRACTOR')}
+      <div class="bd">${B.distractors.slice(0,3).map(d=>`<div class="alert"><span>⚠</span><span>${esc(d)}</span></div>`).join('')}</div>
+    </div>
+  </section>`:''}
+
+  <!-- 정리 -->
+  <section class="sec t-only">
+    ${secH('WRAP_UP')}
+    ${arr(B.wrapUp).slice(0,4).map((w,i)=>`<div class="wrow"><span class="n">${i+1}</span><span>${esc(w)}</span></div>`).join('')}
+  </section>
+
+  <!-- 검증 -->
+  <section class="sec t-only">
+    ${secH('QUALITY',`원문 ${sents.length}문장 · 분석 ${arr(C.lines).length}문장`)}
+    <div class="qc">
+      <div class="qcard"><span class="ic">✓</span><div><b>원문 문장 수 일치</b><span>${sents.length}개 원문 문장을 모두 분석</span></div></div>
+      <div class="qcard"><span class="ic">✓</span><div><b>단락 구성요소 판정</b><span>${esc(pt.patternKo||'')}</span></div></div>
+      <div class="qcard"><span class="ic">✓</span><div><b>연결성 추적</b><span>대용어 ${arr(hg.brothers).length} · 종속어 ${arr(hg.children).length} · 연결어 ${arr(A.connectors).length}</span></div></div>
+      <div class="qcard"><span class="ic">✓</span><div><b>시험 포인트</b><span>출제 유형 ${arr(B.examRoutes).length}건 근거 제시</span></div></div>
+    </div>
+  </section>
+
+  <!-- 워크북 -->
+  <section class="sec pbreak">
+    ${secH('WORKBOOK','단락이론 용어로 스스로 정리해 본다.')}
+    ${arr(B.workbook).map((w,i)=>`<div class="wbq">
+      <div class="q">${i+1}. ${esc(w.q||'')}<em>${esc(w.kind||'')}</em></div>
+      ${arr(w.choices).length?`<div class="ch">${w.choices.map((c,j)=>`<div>${'①②③④⑤'[j]||''} ${esc(c)}</div>`).join('')}</div>`:'<div class="space"></div>'}
+      <div class="ans t-only"><b>정답 ${esc(w.answer||'')}</b> — ${esc(w.explainKo||'')}</div>
+    </div>`).join('')}
+  </section>
+
+  <!-- 다시 읽기 -->
+  <section class="sec s-only">
+    ${secH('RE_READ','마킹 없이 다시 읽으며 구성요소를 스스로 나눠 본다.')}
+    <div class="passage" style="line-height:2.3">${sents.map(s=>`<span class="sent">${esc(s.text)}</span> `).join('')}</div>
+  </section>
+
+  <div class="footline">문장은 따로 읽지 않는다. 하나의 메시지와 권력 구조로 읽는다.</div>
+</div>`;
+
+  $('#out').innerHTML=html;
+  $('#toolbar').style.display='flex';
+  bindLegend();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function lineCard(s,L,P,B){
+  const g=arr(B.grouping).find(x=>arr(x.sids).includes(s.id));
+  return `<div class="line${L.isKey?' key':''}">
+    <div class="lh">
+      <span class="snum">문장 ${esc(s.id.replace('s',''))}</span>
+      ${g?`<span class="tagm">${esc(g.titleKo||ROLE_KO[g.role]||g.role||'')}</span>`:''}
+      ${P.level?`<span class="tagm g">${esc(P.level)}차 정보</span>`:''}
+      ${L.isKey?'<span class="keymark">◎ 핵심 문장</span>':''}
+    </div>
+    <div class="sen">${esc(s.text)}</div>
+    <div class="cols">
+      <div>${arr(L.chunks).length?`<table class="chunk"><tbody>
+        ${L.chunks.map(c=>`<tr><td>${esc(c.en)}</td><td>${esc(c.ko)}</td></tr>`).join('')}
+      </tbody></table>`:''}</div>
+      <div>
+        <div class="kv"><span class="k">한글 해석</span><span class="v">${esc(L.transKo||'')}</span></div>
+        <div class="kv"><span class="k">문맥 설명</span><span class="v">${esc(L.contextKo||'')}</span></div>
+        <div class="kv"><span class="k">연결 관계</span><span class="v">
+          <span class="rel">${esc(L.relTitleKo||'')}</span>
+          <span class="sub">${esc(L.relDescKo||'')}${P.relKo?` · 권력 판정: ${esc(P.relKo)}`:''}</span></span></div>
+      </div>
+    </div>
+    ${arr(L.grammar).length?`<div class="gram">${L.grammar.slice(0,2).map(x=>
+      `<div class="gcard"><b>${esc(x.form)}</b><span>${esc(x.descKo)}</span></div>`).join('')}</div>`:''}
+    ${L.examKo?`<div class="exam"><b>시험 포인트</b><span>${esc(L.examKo)}</span></div>`:''}
+  </div>`;
+}
+
+function tree(sents,powerBy){
+  const byP={};
+  sents.forEach(s=>{const p=powerBy[s.id];const k=(p&&p.parent)?p.parent:'__r__';(byP[k]=byP[k]||[]).push(s)});
+  const build=k=>arr(byP[k]).map(s=>{
+    const p=powerBy[s.id]||{level:1};
+    const lv=Math.min(3,Math.max(1,p.level||1));
+    const sub=build(s.id);
+    return `<div class="tnode"><div class="row"><span class="lv l${lv}">${lv}차</span>
+      <div class="tx">${esc(s.text)}<div class="wy"><b>${esc(p.relKo||'')}</b>${p.whyKo?' — '+esc(p.whyKo):''}</div></div></div>
+      ${sub?`<div class="tkids">${sub}</div>`:''}</div>`;
+  }).join('');
+  return build('__r__')||sents.map(s=>`<div class="tnode"><div class="row"><span class="lv l1">1차</span><div class="tx">${esc(s.text)}</div></div></div>`).join('');
+}
+
+function bindLegend(){
+  $$('.lg').forEach(el=>{el.onclick=()=>{el.classList.toggle('off');
+    document.body.classList.toggle('off-'+el.dataset.k,el.classList.contains('off'))}});
+}
+
+/* ================= 실행 ================= */
+let SHOTS=[];
+const setProg=(p,m)=>{$('#prog').classList.add('on');$('#progBar').style.width=p+'%';$('#progStep').textContent=m};
+const showErr=m=>{const e=$('#err');e.textContent=m;e.classList.add('on')};
+
+async function run(){
+  $('#err').classList.remove('on');
+  const btn=$('#btnRun'); btn.disabled=true;
+  try{
+    let passage=$('#passageInput').value.trim();
+    if(!passage&&!SHOTS.length) throw new Error('지문을 붙여넣거나 스크린샷을 올려 주세요.');
+    if(!passage){
+      setProg(10,'스크린샷에서 지문을 읽는 중…');
+      const raw=await callGemini([{text:OCR_P},...SHOTS.map(s=>({inline_data:{mime_type:s.mime,data:s.b64}}))],{temperature:0,maxOutputTokens:8192});
+      passage=(safeParseJson(raw).passage||'').trim();
+      if(!passage) throw new Error('이미지에서 지문을 찾지 못했습니다. 텍스트로 붙여넣어 주세요.');
+      $('#passageInput').value=passage;
+    }
+    const source=$('#srcInput').value.trim();
+
+    setProg(30,'1/3 · 연결성(PK1~PK3)과 어휘를 분석하는 중…');
+    const A=safeParseJson(await callGemini([{text:pA(passage,source)}]));
+    if(!arr(A.sentences).length) throw new Error('문장 분해에 실패했습니다. 지문을 확인해 주세요.');
+
+    setProg(58,'2/3 · 권력관계(PK4~PK7)와 구성요소를 판정하는 중…');
+    const B=safeParseJson(await callGemini([{text:pB(passage,source,A.sentences)}]));
+
+    setProg(84,'3/3 · 문장별 정밀 분석 중…');
+    const C=safeParseJson(await callGemini([{text:pC(A.sentences,A.head)}]));
+
+    setProg(96,'학습지를 조판하는 중…');
+    render({a:A,b:B,c:C,passage,source});
+    setProg(100,'완료');
+    setTimeout(()=>$('#prog').classList.remove('on'),900);
+  }catch(e){
+    $('#prog').classList.remove('on'); showErr(e.message||String(e));
+  }finally{ btn.disabled=false; }
+}
+
+/* ================= 이미지 ================= */
+function addShot(f){
+  if(!f||!/^image\//.test(f.type))return;
+  const fr=new FileReader();
+  fr.onload=()=>{SHOTS.push({mime:f.type,b64:fr.result.split(',')[1],url:fr.result});paintShots()};
+  fr.readAsDataURL(f);
+}
+function paintShots(){
+  $('#shots').innerHTML=SHOTS.map((s,i)=>`<div class="shot"><img src="${s.url}" alt=""><button data-i="${i}">×</button></div>`).join('');
+  $$('#shots button').forEach(b=>b.onclick=()=>{SHOTS.splice(+b.dataset.i,1);paintShots()});
+}
+document.addEventListener('paste',e=>{
+  const imgs=[...(e.clipboardData?.items||[])].filter(i=>i.type.startsWith('image/'));
+  if(imgs.length){e.preventDefault();imgs.forEach(i=>addShot(i.getAsFile()))}
+});
+['dragenter','dragover'].forEach(ev=>$('#drop').addEventListener(ev,e=>{e.preventDefault();$('#drop').classList.add('hot')}));
+['dragleave','drop'].forEach(ev=>$('#drop').addEventListener(ev,e=>{e.preventDefault();$('#drop').classList.remove('hot')}));
+$('#drop').addEventListener('drop',e=>[...(e.dataTransfer?.files||[])].forEach(addShot));
+$('#drop').onclick=()=>$('#fileInput').click();
+$('#fileInput').onchange=e=>{[...e.target.files].forEach(addShot);e.target.value=''};
+
+/* ================= 내보내기 ================= */
+function exportHtml(){
+  if(!STATE)return;
+  const css=[...document.querySelectorAll('style')].map(s=>s.textContent).join('\n');
+  const sheet=$('#sheet')?.outerHTML||'';
+  const name=fileBase();
+  const doc=`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${esc(name)}</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>${css}
+body{background:#EEF3F6;padding:20px 10px}
+@media print{body{padding:0}}</style></head>
+<body class="${document.body.className}">${sheet}</body></html>`;
+  downloadHtml(doc,`${name}.html`);
+}
+
+/* PDF 저장 — 인쇄 대화상자의 기본 파일 이름은 document.title 을 따른다 */
+function printSheet(){
+  if(!STATE){window.print();return}
+  const t=document.title;
+  document.title=fileBase();
+  const done=()=>{document.title=t;window.removeEventListener('afterprint',done)};
+  window.addEventListener('afterprint',done);
+  window.print();
+  setTimeout(done,1500);
+}
+
+/* ================= 바인딩 ================= */
+$('#btnRun').onclick=run;
+$('#btnKeySave').onclick=()=>{store.set('zb_v3_key',$('#apiKey').value.trim());
+  const b=$('#btnKeySave'),o=b.textContent;b.textContent='저장됨';setTimeout(()=>b.textContent=o,1200)};
+$('#modelSel').onchange=()=>store.set('zb_v3_model',$('#modelSel').value);
+$('#btnPdf').onclick=printSheet;
+$('#btnHtml').onclick=exportHtml;
+$('#btnMan').onclick=openManual;
+$('#btnManPrint').onclick=printManual;
+$('#btnManHtml').onclick=exportManual;
+$('#btnDic').onclick=()=>{renderDic();$('#dicModal').classList.add('on')};
+$$('[data-close]').forEach(b=>b.onclick=()=>$('#'+b.dataset.close).classList.remove('on'));
+$$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('on')});
+$('#btnClear').onclick=()=>location.reload();
+$('#btnSample').onclick=()=>{
+  $('#passageInput').value=`Although you may put off going to sleep in order to squeeze more activities into your day, eventually your need for sleep becomes overwhelming and you are forced to get some sleep. This daily drive for sleep appears to be due, in part, to a compound known as adenosine. This natural chemical builds up in your blood as time awake increases. While you sleep, your body breaks down the adenosine. Thus, this molecule may be what your body uses to keep track of lost sleep and to trigger sleep when needed. An accumulation of adenosine and other factors might explain why, after several nights of less than optimal amounts of sleep, you build up a sleep debt that you must make up by sleeping longer than normal. Because of such built-in molecular feedback, you can't become accustomed to getting less sleep than your body needs. Eventually, a lack of sleep catches up with you.`;
+  $('#srcInput').value='2025 고1 32번';
+};
+$$('.seg button').forEach(b=>b.onclick=()=>{
+  $$('.seg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  document.body.classList.remove('mode-teacher','mode-student');
+  document.body.classList.add('mode-'+b.dataset.mode);
+  syncSaveLabels();
+});
+function syncSaveLabels(){
+  const m=modeKo();
+  const p=$('#btnPdf'),h=$('#btnHtml');
+  if(p) p.textContent=`PDF로 저장 (${m})`;
+  if(h) h.textContent=`HTML 내려받기 (${m})`;
+}
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();run()}
+  if(e.key==='Escape')$$('.modal').forEach(m=>m.classList.remove('on'));
+});
+(function(){
+  const k=store.get('zb_v3_key'); if(k)$('#apiKey').value=k;
+  const m=store.get('zb_v3_model'); if(m)$('#modelSel').value=m;
+  renderDic();
+  syncSaveLabels();
+})();
+</script>
+</body>
+</html>
